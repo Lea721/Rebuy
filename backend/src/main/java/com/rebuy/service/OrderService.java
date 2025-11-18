@@ -1,16 +1,15 @@
 package com.rebuy.service;
 
-import com.rebuy.controller.dto.OrderDetailsResponse;
-import com.rebuy.entity.CartItem;
-import com.rebuy.entity.Order;
-import com.rebuy.entity.OrderItem;
-import com.rebuy.entity.OrderStatus;
-import com.rebuy.repository.CartItemRepository;
+import com.rebuy.controller.dto.*;
+import com.rebuy.entity.*;
 import com.rebuy.repository.OrderItemRepository;
 import com.rebuy.repository.OrderRepository;
+import com.rebuy.repository.ProductRepository;
+import com.rebuy.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -18,61 +17,72 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
-    private final CartItemRepository cartItemRepository;
+    private final UserRepository userRepository;
+    private final ProductRepository productRepository;
 
     public OrderService(OrderRepository orderRepository,
                         OrderItemRepository orderItemRepository,
-                        CartItemRepository cartItemRepository) {
+                        UserRepository userRepository,
+                        ProductRepository productRepository) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
-        this.cartItemRepository = cartItemRepository;
+        this.userRepository = userRepository;
+        this.productRepository = productRepository;
     }
 
-    public List<Order> getOrdersForUser(Long userId) {
-        return orderRepository.findByUserId(userId);
-    }
+    public OrderResponse createOrder(CreateOrderRequest request) {
 
-    public OrderDetailsResponse getOrderDetails(Long orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
-
-        List<OrderItem> items = orderItemRepository.findByOrderId(orderId);
-
-        return new OrderDetailsResponse(order, items);
-    }
-
-    public OrderDetailsResponse checkout(Long userId) {
-        List<CartItem> cartItems = cartItemRepository.findByUserId(userId);
-
-        if (cartItems.isEmpty()) {
-            throw new IllegalArgumentException("Cart is empty");
-        }
-
-        BigDecimal total = cartItems.stream()
-                .map(CartItem::getTotalPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         Order order = new Order();
-        order.setUserId(userId);
-        order.setTotalAmount(total);
-        order.setStatus(OrderStatus.PAID); // simple: assume payment success
+        order.setUser(user);
 
-        Order savedOrder = orderRepository.save(order);
+        List<OrderItem> items = new ArrayList<>();
+        BigDecimal total = BigDecimal.ZERO;
 
-        for (CartItem cartItem : cartItems) {
+        for (CartItemRequest cartItem : request.getItems()) {
+
+            Product product = productRepository.findById(cartItem.getProductId())
+                    .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+            if (product.getStatus() == ProductStatus.SOLD) {
+                throw new IllegalArgumentException("Product already sold: " + product.getTitle());
+            }
+
             OrderItem item = new OrderItem();
-            item.setOrderId(savedOrder.getId());
-            item.setProductId(cartItem.getProductId());
-            item.setQuantity(cartItem.getQuantity());
-            item.setUnitPrice(cartItem.getUnitPrice());
-            item.setTotalPrice(cartItem.getTotalPrice());
-            orderItemRepository.save(item);
+            item.setOrder(order);
+            item.setProduct(product);
+            item.setUnitPrice(product.getPrice());
+            item.setTotalPrice(product.getPrice());
+
+            // mark product as SOLD
+            product.setStatus(ProductStatus.SOLD);
+            productRepository.save(product);
+
+            items.add(item);
+
+            total = total.add(product.getPrice());
         }
 
-        // clear cart after checkout
-        cartItemRepository.deleteAll(cartItems);
+        order.setTotalAmount(total);
+        order.setItems(items);
+        orderRepository.save(order);
 
-        List<OrderItem> orderItems = orderItemRepository.findByOrderId(savedOrder.getId());
-        return new OrderDetailsResponse(savedOrder, orderItems);
+        List<OrderItemResponse> itemResponses = new ArrayList<>();
+        for (OrderItem i : items) {
+            OrderItemResponse ir = new OrderItemResponse();
+            ir.setProductId(i.getProduct().getId());
+            ir.setProductTitle(i.getProduct().getTitle());
+            ir.setPrice(i.getUnitPrice());
+            itemResponses.add(ir);
+        }
+
+        OrderResponse response = new OrderResponse();
+        response.setOrderId(order.getId());
+        response.setTotalAmount(total);
+        response.setItems(itemResponses);
+
+        return response;
     }
 }

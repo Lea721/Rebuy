@@ -1,7 +1,5 @@
 package com.rebuy.controller;
 
-import com.rebuy.controller.dto.AddToCartRequest;
-import com.rebuy.controller.dto.UpdateCartItemRequest;
 import com.rebuy.entity.CartItem;
 import com.rebuy.service.CartService;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/cart")
-@CrossOrigin(origins = "*")
+@CrossOrigin("*")
 public class CartController {
 
     private final CartService cartService;
@@ -22,32 +20,22 @@ public class CartController {
 
     @GetMapping("/{userId}")
     public ResponseEntity<List<CartItem>> getCart(@PathVariable Long userId) {
-        return ResponseEntity.ok(cartService.getCartForUser(userId));
+        return ResponseEntity.ok(cartService.getUserCart(userId));
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<CartItem> addToCart(@RequestBody AddToCartRequest request) {
-        CartItem item = cartService.addToCart(request);
-        return ResponseEntity.ok(item);
+    @PostMapping("/{userId}/{productId}")
+    public ResponseEntity<CartItem> addToCart(@PathVariable Long userId,
+                                              @PathVariable Long productId) {
+        return ResponseEntity.ok(cartService.addToCart(userId, productId));
     }
 
-    @PutMapping("/{itemId}")
-    public ResponseEntity<CartItem> updateCartItem(@PathVariable Long itemId,
-                                                   @RequestBody UpdateCartItemRequest request) {
-        CartItem item = cartService.updateCartItem(itemId, request);
-        if (item == null) {
-            return ResponseEntity.noContent().build(); // item deleted
-        }
-        return ResponseEntity.ok(item);
-    }
-
-    @DeleteMapping("/{itemId}")
-    public ResponseEntity<Void> removeItem(@PathVariable Long itemId) {
-        cartService.removeItem(itemId);
+    @DeleteMapping("/{cartItemId}")
+    public ResponseEntity<Void> removeItem(@PathVariable Long cartItemId) {
+        cartService.removeItem(cartItemId);
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/user/{userId}")
+    @DeleteMapping("/clear/{userId}")
     public ResponseEntity<Void> clearCart(@PathVariable Long userId) {
         cartService.clearCart(userId);
         return ResponseEntity.noContent().build();

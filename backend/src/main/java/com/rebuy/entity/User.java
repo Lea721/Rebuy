@@ -1,40 +1,62 @@
 package com.rebuy.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import java.util.List;
 
 @Entity
-@Table(name = "users") // this will create a "users" table in Supabase
+@Table(name = "users") // table name in Supabase
 public class User {
 
+    // =================== PRIMARY KEY ===================
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
+    // =================== BASIC USER INFO ===================
+
     @Column(nullable = false, unique = true, length = 255)
-    private String email;
+    private String email;  // used for login, must be unique
 
     @Column(nullable = false)
-    private String password; // will be stored hashed (bcrypt)
+    private String password; // bcrypt hashed password
 
     @Column(nullable = false, length = 100)
-    private String displayName;
+    private String name; // renamed from displayName → shows in profile & products
+
+
+    // =================== OPTIONAL PROFILE FIELDS ===================
+
+    private String phone;  // user phone number
+
+    private String city; // location of the user (optional)
 
     @Column(length = 255)
-    private String shippingAddress;
+    private String shippingAddress; // address for buying/delivery
 
-    @Column(length = 30)
-    private String phone;
+    @Column(length = 500)
+    private String profileImageUrl; // profile picture URL (Supabase Storage or local)
 
-    public User() {
-    }
 
-    public User(String email, String password, String displayName) {
+    // =================== RELATION: USER → PRODUCTS ===================
+    // One user can publish many products.
+    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Product> products;
+
+
+    // =================== CONSTRUCTORS ===================
+    public User() {}
+
+    public User(String email, String password, String name) {
         this.email = email;
         this.password = password;
-        this.displayName = displayName;
+        this.name = name;
     }
 
-    // --------- getters & setters ----------
+
+    // =================== GETTERS & SETTERS ===================
     public Long getId() {
         return id;
     }
@@ -59,12 +81,28 @@ public class User {
         this.password = password;
     }
 
-    public String getDisplayName() {
-        return displayName;
+    public String getName() {
+        return name;
     }
 
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 
     public String getShippingAddress() {
@@ -75,11 +113,19 @@ public class User {
         this.shippingAddress = shippingAddress;
     }
 
-    public String getPhone() {
-        return phone;
+    public String getProfileImageUrl() {
+        return profileImageUrl;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
+
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<Product> products) {
+        this.products = products;
     }
 }

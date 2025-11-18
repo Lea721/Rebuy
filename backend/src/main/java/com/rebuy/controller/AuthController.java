@@ -2,6 +2,7 @@ package com.rebuy.controller;
 
 import com.rebuy.controller.dto.LoginRequest;
 import com.rebuy.controller.dto.RegisterRequest;
+import com.rebuy.controller.dto.UserResponse;
 import com.rebuy.entity.User;
 import com.rebuy.service.AuthService;
 import org.springframework.http.ResponseEntity;
@@ -18,18 +19,17 @@ public class AuthController {
         this.authService = authService;
     }
 
+    // ============ REGISTER ============
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<UserResponse> register(@RequestBody RegisterRequest request) {
         User user = authService.register(request);
-        // you might later create a DTO to hide password
-        user.setPassword(null);
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(authService.toResponse(user));
     }
 
+    // ============ LOGIN ============
     @PostMapping("/login")
-    public ResponseEntity<User> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<UserResponse> login(@RequestBody LoginRequest request) {
         User user = authService.login(request);
-        user.setPassword(null);
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(authService.toResponse(user));
     }
 }

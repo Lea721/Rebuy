@@ -1,16 +1,14 @@
 package com.rebuy.controller;
 
-import com.rebuy.controller.dto.OrderDetailsResponse;
-import com.rebuy.entity.Order;
+import com.rebuy.controller.dto.CreateOrderRequest;
+import com.rebuy.controller.dto.OrderResponse;
 import com.rebuy.service.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/orders")
-@CrossOrigin(origins = "*")
+@CrossOrigin("*")
 public class OrderController {
 
     private final OrderService orderService;
@@ -19,19 +17,8 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Order>> getOrdersForUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(orderService.getOrdersForUser(userId));
-    }
-
-    @GetMapping("/{orderId}")
-    public ResponseEntity<OrderDetailsResponse> getOrderDetails(@PathVariable Long orderId) {
-        return ResponseEntity.ok(orderService.getOrderDetails(orderId));
-    }
-
-    @PostMapping("/checkout/{userId}")
-    public ResponseEntity<OrderDetailsResponse> checkout(@PathVariable Long userId) {
-        OrderDetailsResponse response = orderService.checkout(userId);
-        return ResponseEntity.ok(response);
+    @PostMapping("/create")
+    public ResponseEntity<OrderResponse> createOrder(@RequestBody CreateOrderRequest request) {
+        return ResponseEntity.ok(orderService.createOrder(request));
     }
 }

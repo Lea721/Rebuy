@@ -1,11 +1,12 @@
 package com.rebuy.service;
 
-import com.rebuy.controller.dto.AddToCartRequest;
-import com.rebuy.controller.dto.UpdateCartItemRequest;
 import com.rebuy.entity.CartItem;
 import com.rebuy.entity.Product;
+import com.rebuy.entity.ProductStatus;
+import com.rebuy.entity.User;
 import com.rebuy.repository.CartItemRepository;
 import com.rebuy.repository.ProductRepository;
+import com.rebuy.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,61 +16,54 @@ public class CartService {
 
     private final CartItemRepository cartItemRepository;
     private final ProductRepository productRepository;
+    private final UserRepository userRepository;
 
     public CartService(CartItemRepository cartItemRepository,
-                       ProductRepository productRepository) {
+                       ProductRepository productRepository,
+                       UserRepository userRepository) {
+
         this.cartItemRepository = cartItemRepository;
         this.productRepository = productRepository;
+        this.userRepository = userRepository;
     }
 
-    public List<CartItem> getCartForUser(Long userId) {
+    // GET: all cart items for a user
+    public List<CartItem> getUserCart(Long userId) {
         return cartItemRepository.findByUserId(userId);
     }
 
-    public CartItem addToCart(AddToCartRequest request) {
-        if (request.getQuantity() <= 0) {
-            throw new IllegalArgumentException("Quantity must be > 0");
-        }
+    // POST: add product to cart
+    public CartItem addToCart(Long userId, Long productId) {
 
-        Product product = productRepository.findById(request.getProductId())
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
-        // Check if item already in cart
-        CartItem item = cartItemRepository
-                .findByUserIdAndProductId(request.getUserId(), request.getProductId())
-                .orElse(null);
-
-        if (item == null) {
-            item = new CartItem();
-            item.setUserId(request.getUserId());
-            item.setProductId(request.getProductId());
-            item.setUnitPrice(product.getPrice());
-            item.setQuantity(request.getQuantity());
-        } else {
-            item.setQuantity(item.getQuantity() + request.getQuantity());
+        // Cannot add sold products
+        if (product.getStatus() == ProductStatus.SOLD) {
+            throw new IllegalArgumentException("Product already sold");
         }
+
+        // Prevent duplicate items
+        if (cartItemRepository.findByUserIdAndProductId(userId, productId).isPresent()) {
+            return null; // already in cart
+        }
+
+        CartItem item = new CartItem();
+        item.setUser(user);
+        item.setProduct(product);
 
         return cartItemRepository.save(item);
     }
 
-    public CartItem updateCartItem(Long itemId, UpdateCartItemRequest request) {
-        CartItem item = cartItemRepository.findById(itemId)
-                .orElseThrow(() -> new IllegalArgumentException("Cart item not found"));
-
-        if (request.getQuantity() <= 0) {
-            // quantity <= 0 → remove item
-            cartItemRepository.delete(item);
-            return null;
-        }
-
-        item.setQuantity(request.getQuantity());
-        return cartItemRepository.save(item);
+    // DELETE: remove single item
+    public void removeItem(Long cartItemId) {
+        cartItemRepository.deleteById(cartItemId);
     }
 
-    public void removeItem(Long itemId) {
-        cartItemRepository.deleteById(itemId);
-    }
-
+    // DELETE: clear whole cart
     public void clearCart(Long userId) {
         List<CartItem> items = cartItemRepository.findByUserId(userId);
         cartItemRepository.deleteAll(items);

@@ -5,152 +5,126 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "products")
+@Table(name = "products") // This will create/update the "products" table in Supabase
 public class Product {
 
+    // ==================== PRIMARY KEY ====================
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id; // Unique ID for each product
+
+
+    // ==================== BASIC PRODUCT INFO ====================
 
     @Column(nullable = false, length = 150)
-    private String title;
+    private String title; // Product title (example: "iPhone 12")
 
     @Column(nullable = false, length = 1000)
-    private String description;
+    private String description; // Full product description
 
     @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal price;
+    private BigDecimal price; // Price with decimals (ex: 299.99)
+
+
+
+    // ==================== CATEGORY / CONDITION / LOCATION ====================
 
     @Column(length = 100)
-    private String category;      // e.g. "Electronics", "Clothing"
+    private String category; // Example: "Electronics", "Clothing"
 
     @Column(length = 50)
-    private String condition;     // e.g. "New", "Used - Like New"
+    private String condition; // Example: "New", "Used - Excellent"
 
     @Column(length = 100)
-    private String location;      // e.g. "Beirut"
+    private String location; // Example: "Beirut", "Tripoli"
+
+
+
+    // ==================== IMAGE ====================
 
     @Column(length = 500)
-    private String imageUrl;      // Later we’ll use Supabase Storage
+    private String imageUrl; // Temporary: only 1 image. Later we can add multiple images.
+
+
+
+    // ==================== STATUS ====================
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ProductStatus status = ProductStatus.AVAILABLE;
+    // AVAILABLE or SOLD
 
-    // For now just store seller id as Long (simple)
-    private Long sellerId;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+
+    // ==================== SELLER RELATION (IMPORTANT) ====================
+
+    // Many products → One seller
+    // This allows: product.getSeller(), seller.getProducts(), automatic joins in JPA
+    @ManyToOne
+    @JoinColumn(name = "seller_id", nullable = false)
+    private User seller; // The user who published this product
+
+
+
+    // ==================== TIMESTAMPS ====================
+
+    private LocalDateTime createdAt; // Date when product was created
+    private LocalDateTime updatedAt; // Date when product was last updated
 
     @PrePersist
     public void onCreate() {
-        createdAt = LocalDateTime.now();
+        createdAt = LocalDateTime.now(); // Automatically set on insert
         updatedAt = createdAt;
     }
 
     @PreUpdate
     public void onUpdate() {
-        updatedAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now(); // Automatically set on update
     }
+
+
+
+    // ==================== CONSTRUCTOR ====================
 
     public Product() {}
 
-    // -------- getters & setters ----------
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    // ==================== GETTERS & SETTERS ====================
 
-    public String getTitle() {
-        return title;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
 
-    public String getDescription() {
-        return description;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public BigDecimal getPrice() { return price; }
+    public void setPrice(BigDecimal price) { this.price = price; }
 
-    public BigDecimal getPrice() {
-        return price;
-    }
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
+    public String getCondition() { return condition; }
+    public void setCondition(String condition) { this.condition = condition; }
 
-    public String getCategory() {
-        return category;
-    }
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
 
-    public void setCategory(String category) {
-        this.category = category;
-    }
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
-    public String getCondition() {
-        return condition;
-    }
+    public ProductStatus getStatus() { return status; }
+    public void setStatus(ProductStatus status) { this.status = status; }
 
-    public void setCondition(String condition) {
-        this.condition = condition;
-    }
+    public User getSeller() { return seller; }
+    public void setSeller(User seller) { this.seller = seller; }
 
-    public String getLocation() {
-        return location;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public ProductStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(ProductStatus status) {
-        this.status = status;
-    }
-
-    public Long getSellerId() {
-        return sellerId;
-    }
-
-    public void setSellerId(Long sellerId) {
-        this.sellerId = sellerId;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }

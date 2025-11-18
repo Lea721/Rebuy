@@ -1,19 +1,29 @@
 package com.rebuy.controller.dto;
 
-// DTO for receiving registration data from frontend
-public class RegisterRequest {
+// This DTO is sent back to the Angular frontend
+// after login, registration, updating profile, or fetching user data.
+public class UserResponse {
 
-    private String name;              // user's full name
-    private String email;             // login email
-    private String password;          // raw password (will be hashed)
+    private Long id;
+    private String name;
+    private String email;
 
-    private String phone;             // optional
-    private String city;              // optional
-    private String shippingAddress;   // optional
+    private String phone;
+    private String city;
+    private String shippingAddress;
 
-    public RegisterRequest() {}
+    private String profileImageUrl; // optional
 
-    // ======= GETTERS & SETTERS =======
+    public UserResponse() {}
+
+    // ===== GETTERS & SETTERS =====
+
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -27,13 +37,6 @@ public class RegisterRequest {
     }
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getPhone() {
@@ -55,5 +58,12 @@ public class RegisterRequest {
     }
     public void setShippingAddress(String shippingAddress) {
         this.shippingAddress = shippingAddress;
+    }
+
+    public String getProfileImageUrl() {
+        return profileImageUrl;
+    }
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 }

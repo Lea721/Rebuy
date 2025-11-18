@@ -3,6 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
+		<!-- SpringBoot configuration and version-->
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.5.7</version>
@@ -31,21 +32,26 @@
 	</properties>
 	<dependencies>
 		<dependency>
+			<!-- to link spring Data JPA to the database  -->
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 		<dependency>
+			<!-- Spring security for auth -->
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 		<dependency>
+			<!-- Spring web for APIS REST CONTROLLERS running on port 8080-->
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
 		<dependency>
+			<!-- This lets Spring Boot connect to PostgreSQL. -->
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
+			<!-- downloaded only when running (not needed at compile time) -->
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>

@@ -16,6 +16,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
@@ -25,11 +26,11 @@ public class SecurityConfig {
                                 "/api/users/**",
                                 "/api/cart/**",
                                 "/api/orders/**",
+                                "/api/upload/**",      // ✅ FIX: allow image upload
                                 "/error"
                         ).permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()   // or .authenticated() if you add JWT later
                 )
-
                 .httpBasic(Customizer.withDefaults());
 
         return http.build();
