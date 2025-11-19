@@ -1,0 +1,25 @@
+<h2>Register</h2>
+
+<div>
+  <label>Name:
+    <input [(ngModel)]="user.displayName">
+  </label>
+
+  <label>Email:
+    <input [(ngModel)]="user.email">
+  </label>
+
+  <label>Password:
+    <input type="password" [(ngModel)]="user.password">
+  </label>
+
+  <label>Phone:
+    <input [(ngModel)]="user.phone">
+  </label>
+
+  <label>Address:
+    <input [(ngModel)]="user.shippingAddress">
+  </label>
+
+  <button (click)="register()">Register</button>
+</div>
