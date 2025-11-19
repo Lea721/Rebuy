@@ -1,0 +1,177 @@
+<!-- Sell Page -->
+<div class="sell-page">
+  <div class="container">
+    <!-- Header Section -->
+    <div class="sell-header">
+      <div class="header-icon">
+        🌱
+      </div>
+      <h1 class="page-title">Give Your Items a Second Life</h1>
+      <p class="page-subtitle">List your pre-loved items and help reduce waste while making someone else happy</p>
+    </div>
+
+    <!-- Product Listing Form -->
+    <div class="form-container">
+      <div class="form-card">
+        <div class="form-header">
+          <h2 class="form-title">Create Product Listing</h2>
+          <p class="form-subtitle">Fill in the details below to list your item for sale</p>
+        </div>
+
+        <form class="sell-form" (ngSubmit)="onSubmit()">
+          <!-- Product Images Section -->
+          <div class="form-group">
+            <label class="form-label">Product Images (Max 5)</label>
+            <div class="image-upload-area">
+              <div class="upload-zone" *ngIf="images.length < 5">
+                <input 
+                  type="file" 
+                  multiple 
+                  accept="image/*"
+                  (change)="onFileSelect($event)"
+                  class="file-input"
+                  id="imageUpload"
+                >
+                <label for="imageUpload" class="upload-label">
+                  <svg class="upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                  </svg>
+                  <span class="upload-text">Choose Files</span>
+                  <span class="upload-subtext">or drag and drop</span>
+                </label>
+              </div>
+              
+              <!-- Image Preview -->
+              <div class="image-previews" *ngIf="images.length > 0">
+                <div *ngFor="let image of images; let i = index" class="image-preview">
+                  <img [src]="image.url" [alt]="'Product image ' + (i + 1)" class="preview-img">
+                  <button type="button" class="remove-btn" (click)="removeImage(i)">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Product Title -->
+          <div class="form-group">
+            <label for="productTitle" class="form-label">Product Title</label>
+            <input 
+              type="text" 
+              id="productTitle" 
+              name="productTitle"
+              class="form-input" 
+              placeholder="e.g., iPhone 12 Pro 128GB"
+              [(ngModel)]="productTitle"
+              required
+            >
+          </div>
+
+          <!-- Description -->
+          <div class="form-group">
+            <label for="description" class="form-label">Description</label>
+            <textarea 
+              id="description" 
+              name="description"
+              class="form-textarea" 
+              placeholder="Describe your product in detail..."
+              rows="4"
+              [(ngModel)]="description"
+              required
+            ></textarea>
+          </div>
+
+          <!-- Category and Condition Row -->
+          <div class="form-row">
+            <!-- Category Dropdown -->
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <div class="dropdown-wrapper">
+                <button 
+                  type="button"
+                  class="dropdown-button"
+                  (click)="toggleCategoryDropdown()"
+                  [class.active]="isCategoryDropdownOpen"
+                >
+                  {{ getCategoryName() }}
+                  <svg class="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7"></path>
+                  </svg>
+                </button>
+                
+                <div class="dropdown-menu" *ngIf="isCategoryDropdownOpen">
+                  <button 
+                    type="button"
+                    *ngFor="let category of categories"
+                    class="dropdown-item"
+                    [class.selected]="selectedCategory === category.id"
+                    (click)="selectCategory(category)"
+                  >
+                    {{ category.name }}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Condition Dropdown -->
+            <div class="form-group">
+              <label class="form-label">Condition</label>
+              <div class="dropdown-wrapper">
+                <button 
+                  type="button"
+                  class="dropdown-button"
+                  (click)="toggleConditionDropdown()"
+                  [class.active]="isConditionDropdownOpen"
+                >
+                  {{ getConditionName() }}
+                  <svg class="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7"></path>
+                  </svg>
+                </button>
+                
+                <div class="dropdown-menu" *ngIf="isConditionDropdownOpen">
+                  <button 
+                    type="button"
+                    *ngFor="let condition of conditions"
+                    class="dropdown-item"
+                    [class.selected]="selectedCondition === condition.id"
+                    (click)="selectCondition(condition)"
+                  >
+                    {{ condition.name }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Price -->
+          <div class="form-group">
+            <label for="price" class="form-label">Price (USD)</label>
+            <input 
+              type="number" 
+              id="price" 
+              name="price"
+              class="form-input" 
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+              [(ngModel)]="price"
+              required
+            >
+          </div>
+
+          <!-- Submit Button -->
+          <button 
+            type="submit" 
+            class="submit-button"
+            [disabled]="!isFormValid()"
+          >
+            List Product
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,99 @@
+<!-- Products Page -->
+<div class="products-page">
+  <!-- Search and Filters Section -->
+  <div class="search-section">
+    <div class="container">
+      <!-- Search Bar -->
+      <div class="search-bar">
+        <div class="search-input-wrapper">
+          <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <input 
+            type="text" 
+            placeholder="Search products..."
+            class="search-input"
+            [(ngModel)]="searchQuery"
+            (input)="onSearch()"
+          >
+        </div>
+      </div>
+      
+      <!-- Filters Row -->
+      <div class="filters-row">
+        <!-- Category Filter -->
+        <div class="filter-dropdown">
+          <button 
+            class="filter-button"
+            (click)="toggleCategoryDropdown()"
+            [class.active]="isCategoryDropdownOpen"
+          >
+            {{ getCategoryName() }}
+            <svg class="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7"></path>
+            </svg>
+          </button>
+          
+          <div class="dropdown-menu" *ngIf="isCategoryDropdownOpen">
+            <button 
+              *ngFor="let category of categories"
+              class="dropdown-item"
+              [class.selected]="selectedCategory === category.id"
+              (click)="selectCategory(category)"
+            >
+              <span>{{ category.name }}</span>
+              <svg *ngIf="selectedCategory === category.id" class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m5 13 4 4L19 7"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Condition Filter -->
+        <div class="filter-dropdown">
+          <button 
+            class="filter-button"
+            (click)="toggleConditionDropdown()"
+            [class.active]="isConditionDropdownOpen"
+          >
+            {{ getConditionName() }}
+            <svg class="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7"></path>
+            </svg>
+          </button>
+          
+          <div class="dropdown-menu" *ngIf="isConditionDropdownOpen">
+            <button 
+              *ngFor="let condition of conditions"
+              class="dropdown-item"
+              [class.selected]="selectedCondition === condition.id"
+              (click)="selectCondition(condition)"
+            >
+              <span>{{ condition.name }}</span>
+              <svg *ngIf="selectedCondition === condition.id" class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m5 13 4L19 7"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Products Grid Section -->
+  <div class="products-section">
+    <div class="container">
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="products.length === 0">
+        <div class="empty-icon">🔍</div>
+        <h2 class="empty-title">No products found</h2>
+        <p class="empty-description">Try adjusting your filters or search query</p>
+      </div>
+      
+      <!-- Products Grid (will be implemented later) -->
+      <div class="products-grid" *ngIf="products.length > 0">
+        <!-- Product cards will go here -->
+      </div>
+    </div>
+  </div>
+</div>

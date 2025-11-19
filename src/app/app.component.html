@@ -1,0 +1,26 @@
+<!-- Simple App Layout -->
+<div class="app">
+  <!-- Header Navigation -->
+  <header class="header">
+    <div class="container">
+      <nav class="nav">
+        <div class="nav-brand">
+          <a routerLink="/" class="brand-link">Rebuy</a>
+        </div>
+        <div class="nav-links">
+          <a routerLink="/products" class="nav-link">Products</a>
+          <a routerLink="/sell" class="nav-link">Sell</a>
+        </div>
+        <div class="nav-actions">
+          <a routerLink="/login" class="nav-link">Login</a>
+          <a routerLink="/signup" class="btn-signup">Sign Up</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main">
+    <router-outlet></router-outlet>
+  </main>
+</div>

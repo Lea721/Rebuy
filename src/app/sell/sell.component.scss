@@ -1,0 +1,391 @@
+.sell-page {
+  min-height: calc(100vh - 80px);
+  background-color: #faf8f5;
+  padding: 2rem 0;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Header Section */
+.sell-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.eco-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #4a7c59;
+}
+
+.sell-title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #2d3319;
+  margin-bottom: 1rem;
+}
+
+.sell-subtitle {
+  font-size: 1.1rem;
+  color: #6b7158;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Form Card */
+.sell-form-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5dfd5;
+}
+
+.form-section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2d3319;
+  margin-bottom: 0.5rem;
+}
+
+.form-section-subtitle {
+  font-size: 0.875rem;
+  color: #6b7158;
+  margin-bottom: 2rem;
+}
+
+.sell-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Image Upload Section */
+.image-upload-area {
+  margin-bottom: 1rem;
+}
+
+.upload-zone {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.file-input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 2rem 1rem;
+  border: 2px solid #e5dfd5;
+  border-radius: 8px;
+  background: white;
+  color: #2d3319;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  gap: 0.5rem;
+}
+
+.upload-label:hover {
+  border-color: #4a7c59;
+  background: #f0ebe3;
+}
+
+.file-input:focus + .upload-label {
+  border-color: #4a7c59;
+  box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.1);
+}
+
+.upload-icon {
+  width: 32px;
+  height: 32px;
+  color: #6b7158;
+}
+
+.upload-text {
+  font-size: 0.875rem;
+  color: #2d3319;
+  font-weight: 500;
+}
+
+.upload-subtext {
+  font-size: 0.75rem;
+  color: #6b7158;
+  font-weight: 400;
+}
+
+/* Image Preview Styling */
+.image-previews {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.image-preview {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border: 2px solid #e5dfd5;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  background: rgba(0, 0, 0, 0.7);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.remove-btn:hover {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.remove-btn svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* Form Groups */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.form-label {
+  font-weight: 500;
+  color: #2d3319;
+  font-size: 0.875rem;
+}
+
+.form-input, .form-textarea {
+  padding: 0.875rem 1rem;
+  border: 2px solid #e5dfd5;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.form-input:focus, 
+.form-textarea:focus {
+  outline: none;
+  border-color: #4a7c59;
+  box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.1);
+}
+
+.form-textarea {
+  min-height: 120px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.form-input::placeholder, 
+.form-textarea::placeholder {
+  color: #a8a594;
+}
+
+/* Dropdown Styling - Match Filter Dropdowns */
+.dropdown-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.dropdown-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5dfd5;
+  border-radius: 8px;
+  background: white;
+  color: #2d3319;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dropdown-button:hover {
+  border-color: #4a7c59;
+}
+
+.dropdown-button.active {
+  border-color: #4a7c59;
+  box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.1);
+}
+
+.dropdown-arrow {
+  width: 16px;
+  height: 16px;
+  color: #6b7158;
+  transition: transform 0.3s ease;
+}
+
+.dropdown-button.active .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e5dfd5;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  z-index: 50;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: none;
+  color: #2d3319;
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #f0ebe3;
+}
+
+.dropdown-item.selected {
+  background-color: #7ba888;
+  color: white;
+}
+
+.dropdown-item:first-child {
+  border-radius: 8px 8px 0 0;
+}
+
+.dropdown-item:last-child {
+  border-radius: 0 0 8px 8px;
+}
+
+/* Price Input */
+.price-input-wrapper {
+  position: relative;
+}
+
+.currency-symbol {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7158;
+  font-weight: 500;
+}
+
+.price-input {
+  padding-left: 2.5rem;
+}
+
+/* Submit Button */
+.submit-button {
+  background-color: #4a7c59;
+  color: white;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.submit-button:hover {
+  background-color: #3d6b4a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(74, 124, 89, 0.3);
+}
+
+.submit-button:disabled {
+  background-color: #a8a594;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .sell-page {
+    padding: 1.5rem 0;
+  }
+  
+  .sell-header {
+    margin-bottom: 2rem;
+  }
+  
+  .sell-title {
+    font-size: 2rem;
+  }
+  
+  .sell-form-card {
+    padding: 1.5rem;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .upload-area {
+    padding: 2rem 1rem;
+  }
+  
+  .upload-icon {
+    width: 40px;
+    height: 40px;
+  }
+}
