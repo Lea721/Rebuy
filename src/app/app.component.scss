@@ -33,12 +33,12 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  
+
   .nav-link {
     color: #2d3319;
     text-decoration: none;
     font-weight: 500;
-    
+
     &:hover {
       color: #4a7c59;
     }
@@ -47,16 +47,39 @@
 
 .nav-actions {
   display: flex;
-  gap: 1rem;
   align-items: center;
-  
-  .nav-link {
+  gap: 1rem;
+
+  .nav-user {
+    font-weight: 900;
+    font-family: Garamond;
     color: #2d3319;
-    text-decoration: none;
+  }
+
+  .btn-logout {
+    background-color: #e57373;
+    color: white;
+    border: none;
+    padding: 9px 15px;
+    border-radius: 6px;
+    cursor: pointer;
     font-weight: 500;
-    
+
     &:hover {
-      color: #4a7c59;
+      background-color: #d64c4c;
+    }
+  }
+
+  .btn-signup {
+    background-color: #6b9e7c;
+    padding: 6px 14px;
+    border-radius: 6px;
+    color: white;
+    font-weight: 500;
+    text-decoration: none;
+
+    &:hover {
+      background-color: #5a8b6b;
     }
   }
 }

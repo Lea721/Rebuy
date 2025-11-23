@@ -1,48 +1,83 @@
-<!-- Home Page Content -->
 <div class="home">
-  <!-- Hero Section -->
+
+  <!-- HERO SECTION -->
   <section class="hero">
     <div class="hero-content">
+
       <h1 class="hero-title">Give products a second life</h1>
-      <p class="hero-subtitle">Join our sustainable marketplace where pre-loved items find new homes</p>
+
+      <!-- 🔥 Subtitle dynamique -->
+      <p class="hero-subtitle" *ngIf="user">
+        Hello {{ user.name }}, discover new items that match your interests!
+      </p>
+
+      <p class="hero-subtitle" *ngIf="!user">
+        Join our sustainable marketplace where pre-loved items find new homes.
+      </p>
+
+      <!-- ACTION BUTTONS -->
       <div class="hero-actions">
         <a routerLink="/products" class="btn-primary">Shop Now</a>
-        <a routerLink="/login" class="btn-secondary">Start Selling</a>
+
+        <!-- Not logged -->
+        <a routerLink="/login" class="btn-secondary" *ngIf="!user">Start Selling</a>
+
+        <!-- Logged -->
+        <a routerLink="/sell" class="btn-secondary" *ngIf="user">Sell Now</a>
       </div>
+
     </div>
   </section>
 
-  <!-- Features Section -->
+  <!-- FEATURES -->
   <section class="features">
     <div class="container">
       <div class="features-grid">
+
         <div class="feature-card">
           <div class="feature-icon">🌱</div>
           <h3 class="feature-title">Sustainable</h3>
           <p class="feature-description">Reduce waste by giving products a second chance</p>
         </div>
+
         <div class="feature-card">
           <div class="feature-icon">💰</div>
           <h3 class="feature-title">Save Money</h3>
           <p class="feature-description">Find quality items at affordable prices</p>
         </div>
+
         <div class="feature-card">
           <div class="feature-icon">📦</div>
           <h3 class="feature-title">Easy Selling</h3>
           <p class="feature-description">Simple process to sell your unused items</p>
         </div>
+
       </div>
     </div>
   </section>
 
-  <!-- CTA Section -->
+  <!-- CTA -->
   <section class="cta">
     <div class="container">
       <div class="cta-content">
+
         <h2 class="cta-title">Ready to start your sustainable journey?</h2>
-        <p class="cta-subtitle">Join thousands of users who are making a difference</p>
-        <a routerLink="/signup" class="btn-cta">Get Started Today</a>
+
+        <p class="cta-subtitle" *ngIf="!user">
+          Join thousands of users who are making a difference.
+        </p>
+
+        <p class="cta-subtitle" *ngIf="user">
+          Amazing things are waiting for you, {{ user.name }}!
+        </p>
+
+        <!-- CTA BUTTON -->
+        <a routerLink="/signup" class="btn-cta" *ngIf="!user">Get Started Today</a>
+
+        <a routerLink="/sell" class="btn-cta" *ngIf="user">Sell Your First Item</a>
+
       </div>
     </div>
   </section>
+
 </div>
