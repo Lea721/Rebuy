@@ -7,7 +7,12 @@
         <p class="login-subtitle">Login to your Rebuy account</p>
       </div>
       
-      <form class="login-form">
+      <form class="login-form" (ngSubmit)="onSubmit()" #loginForm="ngForm">
+        <!-- Error Message -->
+        <div class="error-message" *ngIf="errorMessage">
+          {{ errorMessage }}
+        </div>
+
         <div class="form-group">
           <label for="email" class="form-label">Email</label>
           <input 
@@ -16,8 +21,13 @@
             name="email" 
             class="form-input" 
             placeholder="you@example.com"
+            [(ngModel)]="loginData.email"
             required
+            #emailInput="ngModel"
           >
+          <div class="field-error" *ngIf="emailInput.invalid && emailInput.touched">
+            Email is required
+          </div>
         </div>
         
         <div class="form-group">
@@ -26,12 +36,25 @@
             type="password" 
             id="password" 
             name="password" 
-            class="form-input" 
+            class="form-input"
+            placeholder="Enter your password" 
+            [(ngModel)]="loginData.password"
             required
+            #passwordInput="ngModel"
           >
+          <div class="field-error" *ngIf="passwordInput.invalid && passwordInput.touched">
+            Password is required
+          </div>
         </div>
         
-        <button type="submit" class="btn-login">Login</button>
+        <button 
+          type="submit" 
+          class="btn-login"
+          [disabled]="isLoading || loginForm.invalid"
+        >
+          <span *ngIf="!isLoading">Login</span>
+          <span *ngIf="isLoading">Logging in...</span>
+        </button>
         
         <div class="login-footer">
           <p class="signup-link">

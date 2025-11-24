@@ -9,11 +9,65 @@
         </div>
         <div class="nav-links">
           <a routerLink="/products" class="nav-link">Products</a>
-          <a routerLink="/sell" class="nav-link">Sell</a>
+          <a routerLink="/sell" class="nav-link" *ngIf="isAuthenticated()">Sell</a>
         </div>
+        
+        <!-- Authentication Actions -->
         <div class="nav-actions">
-          <a routerLink="/login" class="nav-link">Login</a>
-          <a routerLink="/signup" class="btn-signup">Sign Up</a>
+          <!-- Not Authenticated -->
+          <ng-container *ngIf="!isAuthenticated()">
+            <a routerLink="/login" class="nav-link">Login</a>
+            <a routerLink="/signup" class="btn-signup">Sign Up</a>
+          </ng-container>
+          
+          <!-- Authenticated User Dropdown -->
+          <div class="user-dropdown" *ngIf="isAuthenticated()">
+            <button 
+              class="user-avatar user-button" 
+              (click)="toggleUserDropdown()"
+              [class.active]="isUserDropdownOpen"
+            >
+              <span class="avatar-initials">{{ getUserInitials() }}</span>
+              <svg class="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7"></path>
+              </svg>
+            </button>
+            
+            <!-- Dropdown Menu -->
+            <div class="dropdown-menu" *ngIf="isUserDropdownOpen">
+              <div class="dropdown-header">
+                <p class="user-name">{{ currentUser?.name }}</p>
+                <p class="user-email">{{ currentUser?.email }}</p>
+              </div>
+              
+              <div class="dropdown-divider"></div>
+              
+              <div class="dropdown-items">
+                <button class="dropdown-item" (click)="closeUserDropdown()">
+                  <svg class="item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                  </svg>
+                  Profile
+                </button>
+                
+                <button class="dropdown-item" (click)="closeUserDropdown()">
+                  <svg class="item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                  </svg>
+                  My Listings
+                </button>
+                
+                <div class="dropdown-divider"></div>
+                
+                <button class="dropdown-item logout" (click)="onLogout()">
+                  <svg class="item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                  </svg>
+                  Logout
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </nav>
     </div>
