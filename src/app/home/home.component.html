@@ -7,7 +7,7 @@
       <p class="hero-subtitle">Join our sustainable marketplace where pre-loved items find new homes</p>
       <div class="hero-actions">
         <a routerLink="/products" class="btn-primary">Shop Now</a>
-        <a routerLink="/login" class="btn-secondary">Start Selling</a>
+        <a [routerLink]="getSellLink()" class="btn-secondary">Start Selling</a>
       </div>
     </div>
   </section>

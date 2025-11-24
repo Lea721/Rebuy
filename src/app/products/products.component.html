@@ -83,16 +83,61 @@
   <!-- Products Grid Section -->
   <div class="products-section">
     <div class="container">
+      <!-- Loading State -->
+      <div class="loading-state" *ngIf="isLoading">
+        <div class="loading-spinner"></div>
+        <p>Loading products...</p>
+      </div>
+
+      <!-- Error Message -->
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+        <button class="retry-btn" (click)="loadProducts()">Retry</button>
+      </div>
+      
       <!-- Empty State -->
-      <div class="empty-state" *ngIf="products.length === 0">
+      <div class="empty-state" *ngIf="!isLoading && !errorMessage && filteredProducts.length === 0">
         <div class="empty-icon">🔍</div>
         <h2 class="empty-title">No products found</h2>
         <p class="empty-description">Try adjusting your filters or search query</p>
       </div>
       
-      <!-- Products Grid (will be implemented later) -->
-      <div class="products-grid" *ngIf="products.length > 0">
-        <!-- Product cards will go here -->
+      <!-- Products Grid -->
+      <div class="products-grid" *ngIf="!isLoading && !errorMessage && filteredProducts.length > 0">
+        <div class="product-card" *ngFor="let product of filteredProducts">
+          <div class="product-image-container">
+            <img 
+              [src]="product.imageUrl" 
+              [alt]="product.title"
+              class="product-image"
+              (error)="onImageError($event)"
+            >
+            <div class="product-status" [class]="product.status.toLowerCase()">
+              {{ product.status }}
+            </div>
+          </div>
+          
+          <div class="product-info">
+            <h3 class="product-title">{{ product.title }}</h3>
+            <p class="product-description">{{ product.description | slice:0:100 }}{{ product.description.length > 100 ? '...' : '' }}</p>
+            
+            <div class="product-details">
+              <div class="product-meta">
+                <span class="product-category">{{ product.category }}</span>
+                <span class="product-condition">{{ product.condition }}</span>
+              </div>
+              <div class="product-location">📍 {{ product.location }}</div>
+            </div>
+            
+            <div class="product-footer">
+              <span class="product-price">{{ formatPrice(product.price) }}</span>
+              <div class="product-footer-right">
+                <span class="product-seller" *ngIf="product.seller">by {{ product.seller.name }}</span>
+                <span class="product-date">{{ product.createdAt | date:'MMM d, y' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

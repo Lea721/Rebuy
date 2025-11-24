@@ -1,0 +1,146 @@
+<div class="edit-profile-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading">
+    <div class="loading-spinner"></div>
+    <p>Loading profile data...</p>
+  </div>
+
+  <!-- Edit Form -->
+  <div *ngIf="!isLoading" class="edit-profile-content">
+    <!-- Header -->
+    <div class="form-header">
+      <button class="back-btn" (click)="cancel()">
+        <i class="fas fa-arrow-left"></i> Back to Profile
+      </button>
+      <h1 class="page-title">Edit Profile</h1>
+      <p class="page-subtitle">Update your personal information</p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="form-card">
+      <form (ngSubmit)="onSubmit()" #profileForm="ngForm">
+        <!-- Success Message -->
+        <div *ngIf="successMessage" class="success-message">
+          <i class="fas fa-check-circle"></i> {{ successMessage }}
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="errorMessage" class="error-message">
+          <i class="fas fa-exclamation-triangle"></i> {{ errorMessage }}
+        </div>
+
+        <!-- Personal Information Section -->
+        <div class="form-section">
+          <h2 class="section-title">
+            <i class="fas fa-user"></i> Personal Information
+          </h2>
+
+          <div class="form-group">
+            <label class="form-label" for="name">Full Name *</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              class="form-input"
+              [(ngModel)]="name"
+              required
+              placeholder="Enter your full name"
+            >
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="phone">Phone Number</label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                class="form-input"
+                [(ngModel)]="phone"
+                placeholder="Enter your phone number"
+              >
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="city">City</label>
+              <input
+                type="text"
+                id="city"
+                name="city"
+                class="form-input"
+                [(ngModel)]="city"
+                placeholder="Enter your city"
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Shipping Information Section -->
+        <div class="form-section">
+          <h2 class="section-title">
+            <i class="fas fa-shipping-fast"></i> Shipping Information
+          </h2>
+
+          <div class="form-group">
+            <label class="form-label" for="shippingAddress">Shipping Address</label>
+            <textarea
+              id="shippingAddress"
+              name="shippingAddress"
+              class="form-textarea"
+              [(ngModel)]="shippingAddress"
+              placeholder="Enter your complete shipping address"
+              rows="3"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Profile Image Section -->
+        <div class="form-section">
+          <h2 class="section-title">
+            <i class="fas fa-image"></i> Profile Image
+          </h2>
+
+          <div class="form-group">
+            <label class="form-label" for="profileImageUrl">Profile Image URL</label>
+            <input
+              type="url"
+              id="profileImageUrl"
+              name="profileImageUrl"
+              class="form-input"
+              [(ngModel)]="profileImageUrl"
+              placeholder="Enter image URL (optional)"
+            >
+            <div class="form-hint">
+              Provide a direct link to your profile image
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn-secondary"
+            (click)="cancel()"
+            [disabled]="isSaving"
+          >
+            Cancel
+          </button>
+          
+          <button
+            type="submit"
+            class="btn-primary"
+            [disabled]="isSaving || !profileForm.valid || !name.trim()"
+          >
+            <span *ngIf="!isSaving">
+              <i class="fas fa-save"></i> Save Changes
+            </span>
+            <span *ngIf="isSaving">
+              <i class="fas fa-spinner fa-spin"></i> Saving...
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

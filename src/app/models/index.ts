@@ -42,7 +42,7 @@ export interface UserResponse {
   profileImageUrl?: string;
 }
 
-// Product models (to be updated later when you share Product entity)
+// Product models - matching backend Product entity
 export interface Product {
   id?: number;
   title: string;
@@ -50,25 +50,37 @@ export interface Product {
   price: number;
   category: string;
   condition: string;
-  images: string[];
-  sellerId?: number;
-  sellerName?: string;
+  location: string;
+  imageUrl: string;
+  status: 'AVAILABLE' | 'SOLD';
+  seller?: User;
   createdAt?: Date;
+  updatedAt?: Date;
 }
 
+// ProductRequest DTO - matching backend
 export interface ProductRequest {
   title: string;
   description: string;
   price: number;
   category: string;
   condition: string;
-  images: File[];
+  location: string;
+  imageUrl: string;
+  sellerId: number;
 }
 
+// Frontend-specific models
 export interface ProductFilter {
   category?: string;
   condition?: string;
   search?: string;
+  location?: string;
   minPrice?: number;
   maxPrice?: number;
+}
+
+// Image upload response
+export interface ImageUploadResponse {
+  url: string;
 }
