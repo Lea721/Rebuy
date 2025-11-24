@@ -189,6 +189,10 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
+  
+  .form-group {
+    flex: 1;
+  }
 }
 
 .form-label {
@@ -222,6 +226,14 @@
 .form-input::placeholder, 
 .form-textarea::placeholder {
   color: #a8a594;
+}
+
+/* Field Error Styling */
+.field-error {
+  color: #dc2626;
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-top: 0.25rem;
 }
 
 /* Dropdown Styling - Match Filter Dropdowns */

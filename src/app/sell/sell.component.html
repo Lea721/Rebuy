@@ -4,29 +4,39 @@
     <!-- Header Section -->
     <div class="sell-header">
       <div class="header-icon">
-        🌱
+        {{ isEditMode ? '✏️' : '🌱' }}
       </div>
-      <h1 class="page-title">Give Your Items a Second Life</h1>
-      <p class="page-subtitle">List your pre-loved items and help reduce waste while making someone else happy</p>
+      <h1 class="page-title">{{ isEditMode ? 'Edit Your Listing' : 'Give Your Items a Second Life' }}</h1>
+      <p class="page-subtitle">{{ isEditMode ? 'Update your product details below' : 'List your pre-loved items and help reduce waste while making someone else happy' }}</p>
+    </div>
+
+    <!-- Loading State for Edit Mode -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="loading-spinner"></div>
+      <p>Loading product details...</p>
     </div>
 
     <!-- Product Listing Form -->
-    <div class="form-container">
+    <div class="form-container" *ngIf="!isLoading">
       <div class="form-card">
         <div class="form-header">
-          <h2 class="form-title">Create Product Listing</h2>
-          <p class="form-subtitle">Fill in the details below to list your item for sale</p>
+          <h2 class="form-title">{{ isEditMode ? 'Edit Product Listing' : 'Create Product Listing' }}</h2>
+          <p class="form-subtitle">{{ isEditMode ? 'Update the details below to modify your listing' : 'Fill in the details below to list your item for sale' }}</p>
         </div>
 
-        <form class="sell-form" (ngSubmit)="onSubmit()">
-          <!-- Product Images Section -->
+        <form class="sell-form" (ngSubmit)="onSubmit()" #sellForm="ngForm">
+          <!-- Error Message -->
+          <div class="error-message" *ngIf="errorMessage">
+            {{ errorMessage }}
+          </div>
+
+          <!-- Product Image Section -->
           <div class="form-group">
-            <label class="form-label">Product Images (Max 5)</label>
+            <label class="form-label">Product Image</label>
             <div class="image-upload-area">
-              <div class="upload-zone" *ngIf="images.length < 5">
+              <div class="upload-zone" *ngIf="!selectedImage">
                 <input 
                   type="file" 
-                  multiple 
                   accept="image/*"
                   (change)="onFileSelect($event)"
                   class="file-input"
@@ -36,16 +46,16 @@
                   <svg class="upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                   </svg>
-                  <span class="upload-text">Choose Files</span>
-                  <span class="upload-subtext">or drag and drop</span>
+                  <span class="upload-text">Choose Image</span>
+                  <span class="upload-subtext">JPG, PNG up to 10MB</span>
                 </label>
               </div>
               
               <!-- Image Preview -->
-              <div class="image-previews" *ngIf="images.length > 0">
-                <div *ngFor="let image of images; let i = index" class="image-preview">
-                  <img [src]="image.url" [alt]="'Product image ' + (i + 1)" class="preview-img">
-                  <button type="button" class="remove-btn" (click)="removeImage(i)">
+              <div class="image-preview-container" *ngIf="selectedImage && imagePreviewUrl">
+                <div class="image-preview">
+                  <img [src]="imagePreviewUrl" [alt]="productTitle || 'Product image'" class="preview-img">
+                  <button type="button" class="remove-btn" (click)="removeImage()">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
@@ -146,29 +156,56 @@
             </div>
           </div>
 
-          <!-- Price -->
-          <div class="form-group">
-            <label for="price" class="form-label">Price (USD)</label>
-            <input 
-              type="number" 
-              id="price" 
-              name="price"
-              class="form-input" 
-              placeholder="0.00"
-              step="0.01"
-              min="0"
-              [(ngModel)]="price"
-              required
-            >
+          <!-- Location and Price Row -->
+          <div class="form-row">
+            <!-- Location -->
+            <div class="form-group">
+              <label for="location" class="form-label">Location</label>
+              <input 
+                type="text" 
+                id="location" 
+                name="location"
+                class="form-input" 
+                placeholder="e.g., Beirut, Tripoli"
+                [(ngModel)]="location"
+                required
+                #locationInput="ngModel"
+              >
+              <div class="field-error" *ngIf="locationInput.invalid && locationInput.touched">
+                Location is required
+              </div>
+            </div>
+
+            <!-- Price -->
+            <div class="form-group">
+              <label for="price" class="form-label">Price (USD)</label>
+              <input 
+                type="number" 
+                id="price" 
+                name="price"
+                class="form-input" 
+                placeholder="0.00"
+                step="0.01"
+                min="0"
+                [(ngModel)]="price"
+                required
+                #priceInput="ngModel"
+              >
+              <div class="field-error" *ngIf="priceInput.invalid && priceInput.touched">
+                Valid price is required
+              </div>
+            </div>
           </div>
 
           <!-- Submit Button -->
           <button 
             type="submit" 
             class="submit-button"
-            [disabled]="!isFormValid()"
+            [disabled]="isSubmitting || !sellForm.valid || !isFormValid()"
           >
-            List Product
+            <span *ngIf="!isSubmitting && !isUploading">{{ isEditMode ? 'Update Product' : 'List Product' }}</span>
+            <span *ngIf="isUploading">Uploading image...</span>
+            <span *ngIf="isSubmitting && !isUploading">{{ isEditMode ? 'Updating listing...' : 'Creating listing...' }}</span>
           </button>
         </form>
       </div>
