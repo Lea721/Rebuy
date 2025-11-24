@@ -1,48 +1,71 @@
 package com.rebuy.controller;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
+import java.net.URI;
+import java.util.Optional;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.rebuy.entity.Product;
+import com.rebuy.repository.ProductRepository;
+import com.rebuy.service.SupabaseStorageService;
 
 @RestController
 @RequestMapping("/api/upload")
 @CrossOrigin("*")
-public class UploadController implements WebMvcConfigurer {
+public class UploadController {
 
-    private static final String UPLOAD_DIR = "uploads/";
+    private final ProductRepository productRepository;
+    private final SupabaseStorageService supabaseStorageService;
 
-    @PostMapping("/image")
-    public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
-
-        // Create uploads/ folder if not exists
-        File folder = new File(UPLOAD_DIR);
-        if (!folder.exists()) {
-            folder.mkdirs();
-        }
-
-        // unique file name
-        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-
-        // save file
-        Path filepath = Paths.get(UPLOAD_DIR, fileName);
-        Files.write(filepath, file.getBytes());
-
-        // return URL to Angular
-        String imageUrl = "http://localhost:8080/uploads/" + fileName;
-
-        return ResponseEntity.ok(imageUrl);
+    public UploadController(ProductRepository productRepository, SupabaseStorageService supabaseStorageService) {
+        this.productRepository = productRepository;
+        this.supabaseStorageService = supabaseStorageService;
     }
 
-    // allow Spring Boot to serve images publicly
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:" + UPLOAD_DIR);
+    // Upload image and save it in the database associated with a product
+    @PostMapping("/product/{productId}/image")
+    public ResponseEntity<?> uploadProductImage(@PathVariable Long productId, @RequestParam("file") MultipartFile file) throws IOException {
+        Optional<Product> maybe = productRepository.findById(productId);
+        if (maybe.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Product product = maybe.get();
+
+        // upload to Supabase Storage and store public URL on product
+        String publicUrl = supabaseStorageService.uploadProductImage(productId, file);
+
+        product.setImageUrl(publicUrl);
+        product.setImageContentType(file.getContentType());
+        product.setImageFilename(file.getOriginalFilename());
+
+        productRepository.save(product);
+
+        return ResponseEntity.created(URI.create(publicUrl)).body(publicUrl);
+    }
+
+    // Serve product image bytes from DB
+    @GetMapping("/product/{productId}/image")
+    public ResponseEntity<?> getProductImage(@PathVariable Long productId) {
+        Optional<Product> maybe = productRepository.findById(productId);
+        if (maybe.isEmpty()) return ResponseEntity.notFound().build();
+
+        Product product = maybe.get();
+        // If product has an external URL (e.g., Supabase storage), redirect to it so clients fetch directly
+        if (product.getImageUrl() != null && !product.getImageUrl().isBlank()) {
+            return ResponseEntity.status(302).location(URI.create(product.getImageUrl())).build();
+        }
+
+        // No image stored
+        return ResponseEntity.noContent().build();
     }
 }

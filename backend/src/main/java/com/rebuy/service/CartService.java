@@ -46,14 +46,18 @@ public class CartService {
             throw new IllegalArgumentException("Product already sold");
         }
 
-        // Prevent duplicate items
-        if (cartItemRepository.findByUserIdAndProductId(userId, productId).isPresent()) {
-            return null; // already in cart
+        // If already in cart, increment quantity
+        java.util.Optional<CartItem> existing = cartItemRepository.findByUserIdAndProductId(userId, productId);
+        if (existing.isPresent()) {
+            CartItem item = existing.get();
+            item.incrementQuantity(1);
+            return cartItemRepository.save(item);
         }
 
         CartItem item = new CartItem();
         item.setUser(user);
         item.setProduct(product);
+        item.setQuantity(1);
 
         return cartItemRepository.save(item);
     }
@@ -67,5 +71,14 @@ public class CartService {
     public void clearCart(Long userId) {
         List<CartItem> items = cartItemRepository.findByUserId(userId);
         cartItemRepository.deleteAll(items);
+    }
+
+    // Update quantity for a cart item
+    public CartItem updateQuantity(Long cartItemId, int quantity) {
+        if (quantity < 1) throw new IllegalArgumentException("Quantity must be at least 1");
+        CartItem item = cartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new java.util.NoSuchElementException("Cart item not found"));
+        item.setQuantity(quantity);
+        return cartItemRepository.save(item);
     }
 }

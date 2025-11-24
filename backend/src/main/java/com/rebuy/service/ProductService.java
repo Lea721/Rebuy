@@ -1,14 +1,15 @@
 package com.rebuy.service;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.rebuy.controller.dto.ProductRequest;
 import com.rebuy.entity.Product;
 import com.rebuy.entity.ProductStatus;
 import com.rebuy.entity.User;
 import com.rebuy.repository.ProductRepository;
 import com.rebuy.repository.UserRepository;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class ProductService {
@@ -55,12 +56,25 @@ public class ProductService {
         return productRepository.save(product);
     }
 
+    public Product updateImageUrl(Long id, String imageUrl, String contentType, String filename) {
+        Product product = getById(id);
+        product.setImageUrl(imageUrl);
+        product.setImageContentType(contentType);
+        product.setImageFilename(filename);
+        return productRepository.save(product);
+    }
+
     public void delete(Long id) {
         productRepository.deleteById(id);
     }
 
     public List<Product> getAvailable() {
         return productRepository.findByStatus(ProductStatus.AVAILABLE);
+    }
+
+    // Return products published by a specific seller (user)
+    public List<Product> getBySellerId(Long sellerId) {
+        return productRepository.findBySellerId(sellerId);
     }
 
 
