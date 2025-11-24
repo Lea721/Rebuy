@@ -18,48 +18,69 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class SupabaseStorageService {
 
-    @Value("${supabase.url:}")
+    @Value("${supabase.url}")
     private String supabaseUrl;
 
-    @Value("${supabase.service-key:}")
+    @Value("${supabase.service-key}")
     private String supabaseServiceKey;
 
-    @Value("${supabase.bucket:public}")
+    @Value("${supabase.bucket}")
     private String bucket;
 
-    private final RestTemplate rest = new RestTemplate();
+    private final RestTemplate restTemplate = new RestTemplate();
 
     public String uploadProductImage(Long productId, MultipartFile file) throws IOException {
-        if (supabaseUrl == null || supabaseUrl.isBlank() || supabaseServiceKey == null || supabaseServiceKey.isBlank()) {
-            throw new IllegalStateException("Supabase storage is not configured (supabase.url or supabase.service-key is missing)");
+
+        if (supabaseUrl == null || supabaseUrl.isBlank()) {
+            throw new IllegalStateException("Supabase URL missing in application.properties");
         }
 
+        if (supabaseServiceKey == null || supabaseServiceKey.isBlank()) {
+            throw new IllegalStateException("Supabase service key missing in application.properties");
+        }
+
+        // Trim ANY hidden spaces or trailing slash
+        String endpoint = supabaseUrl.trim();
+        if (endpoint.endsWith("/")) {
+            endpoint = endpoint.substring(0, endpoint.length() - 1);
+        }
+
+        // file name
         String filename = Instant.now().toEpochMilli() + "_" + file.getOriginalFilename();
+
+        // Create path inside bucket
         String objectPath = "products/" + productId + "/" + filename;
 
-        String endpoint = supabaseUrl;
-        if (endpoint.endsWith("/")) endpoint = endpoint.substring(0, endpoint.length() - 1);
-        // Storage upload endpoint (PUT to object path)
+        // Supabase upload endpoint
         String uploadUrl = endpoint + "/storage/v1/object/" + bucket + "/" + objectPath;
 
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(supabaseServiceKey);
-        headers.setContentType(MediaType.parseMediaType(file.getContentType() != null ? file.getContentType() : MediaType.APPLICATION_OCTET_STREAM_VALUE));
-        // allow overwriting if exists
+
+        // Safe content-type fallback
+        String type = file.getContentType() != null ? file.getContentType() : "application/octet-stream";
+        headers.setContentType(MediaType.parseMediaType(type));
+
+        // allow creating or overwriting
         headers.add("x-upsert", "true");
 
-        byte[] body = StreamUtils.copyToByteArray(file.getInputStream());
+        byte[] fileBytes = StreamUtils.copyToByteArray(file.getInputStream());
 
-        HttpEntity<byte[]> request = new HttpEntity<>(body, headers);
+        HttpEntity<byte[]> request = new HttpEntity<>(fileBytes, headers);
 
-        ResponseEntity<String> resp = rest.exchange(URI.create(uploadUrl), HttpMethod.PUT, request, String.class);
+        // Upload file
+        ResponseEntity<String> resp = restTemplate.exchange(
+                URI.create(uploadUrl),
+                HttpMethod.PUT,
+                request,
+                String.class
+        );
 
         if (!resp.getStatusCode().is2xxSuccessful()) {
-            throw new IOException("Failed to upload to Supabase Storage: " + resp.getStatusCode() + " - " + resp.getBody());
+            throw new IOException("Failed to upload to Supabase: " + resp.getStatusCode());
         }
 
-        // Public URL for stored object (public bucket)
-        String publicUrl = endpoint + "/storage/v1/object/public/" + bucket + "/" + objectPath;
-        return publicUrl;
+        // Public URL
+        return endpoint + "/storage/v1/object/public/" + bucket + "/" + objectPath;
     }
 }
