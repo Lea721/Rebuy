@@ -6,6 +6,8 @@ import com.rebuy.entity.User;
 import com.rebuy.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserService {
 
@@ -33,7 +35,17 @@ public class UserService {
 
         // update fields
         if (request.getName() != null) user.setName(request.getName());
-        if (request.getPhone() != null) user.setPhone(request.getPhone());
+        if (request.getPhone() != null) {
+            String newPhone = request.getPhone();
+            Optional<User> existing = userRepository.findByPhone(newPhone);
+            if (existing.isPresent() && !existing.get().getId().equals(id)) {
+                throw new com.rebuy.exception.FieldValidationException(
+                        java.util.Map.of("phone", "Phone already used"),
+                        java.util.Map.of("phone", "duplicate")
+                );
+            }
+            user.setPhone(newPhone);
+        }
         if (request.getCity() != null) user.setCity(request.getCity());
         if (request.getShippingAddress() != null) user.setShippingAddress(request.getShippingAddress());
         if (request.getProfileImageUrl() != null) user.setProfileImageUrl(request.getProfileImageUrl());
