@@ -8,35 +8,37 @@ import { ProductRequest, Product } from '../models';
 
 @Component({
   selector: 'app-sell',
+  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './sell.component.html',
   styleUrl: './sell.component.scss'
 })
 export class SellComponent implements OnInit {
+
   // Edit mode
-  isEditMode: boolean = false;
+  isEditMode = false;
   editProductId: number | null = null;
   currentProduct: Product | null = null;
-  
-  // Form data
-  productTitle: string = '';
-  description: string = '';
-  selectedCategory: string = '';
-  selectedCondition: string = '';
-  location: string = '';
+
+  // Form fields
+  productTitle = '';
+  description = '';
+  selectedCategory = '';
+  selectedCondition = '';
+  location = '';
   price: number | null = null;
+
   selectedImage: File | null = null;
   imagePreviewUrl: string = '';
-  
-  // States
-  isCategoryDropdownOpen: boolean = false;
-  isConditionDropdownOpen: boolean = false;
-  isUploading: boolean = false;
-  isSubmitting: boolean = false;
-  isLoading: boolean = false;
-  errorMessage: string = '';
-  
-  // Options (matching backend categories)
+
+  // UI flags
+  isCategoryDropdownOpen = false;
+  isConditionDropdownOpen = false;
+  isSubmitting = false;
+  isLoading = false;
+  isUploading = false;
+  errorMessage = '';
+
   categories = [
     { id: 'Electronics', name: 'Electronics' },
     { id: 'Clothing', name: 'Clothing' },
@@ -44,7 +46,7 @@ export class SellComponent implements OnInit {
     { id: 'Books', name: 'Books' },
     { id: 'Sports', name: 'Sports' }
   ];
-  
+
   conditions = [
     { id: 'New', name: 'New' },
     { id: 'Used - Excellent', name: 'Like New' },
@@ -58,9 +60,8 @@ export class SellComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute
   ) {}
-  
+
   ngOnInit() {
-    // Check if we're in edit mode
     this.route.params.subscribe(params => {
       if (params['id']) {
         this.isEditMode = true;
@@ -69,25 +70,25 @@ export class SellComponent implements OnInit {
       }
     });
   }
-  
+
   loadProductForEdit() {
     if (!this.editProductId) return;
-    
+
     this.isLoading = true;
+
     this.productService.getProductById(this.editProductId).subscribe({
-      next: (product: Product) => {
+      next: (product) => {
         this.currentProduct = product;
         this.populateForm(product);
         this.isLoading = false;
       },
-      error: (error: any) => {
-        console.error('Error loading product for edit:', error);
-        this.errorMessage = 'Failed to load product for editing.';
+      error: () => {
+        this.errorMessage = 'Failed to load product.';
         this.isLoading = false;
       }
     });
   }
-  
+
   populateForm(product: Product) {
     this.productTitle = product.title;
     this.description = product.description;
@@ -95,106 +96,69 @@ export class SellComponent implements OnInit {
     this.selectedCondition = product.condition;
     this.location = product.location;
     this.price = product.price;
-    
-    // Set image preview if product has an image
+
     if (product.imageUrl) {
       this.imagePreviewUrl = product.imageUrl;
     }
   }
-  
+
   toggleCategoryDropdown() {
     this.isCategoryDropdownOpen = !this.isCategoryDropdownOpen;
     this.isConditionDropdownOpen = false;
   }
-  
+
   toggleConditionDropdown() {
     this.isConditionDropdownOpen = !this.isConditionDropdownOpen;
     this.isCategoryDropdownOpen = false;
   }
-  
+
   selectCategory(category: any) {
     this.selectedCategory = category.id;
     this.isCategoryDropdownOpen = false;
   }
-  
+
   selectCondition(condition: any) {
     this.selectedCondition = condition.id;
     this.isConditionDropdownOpen = false;
   }
-  
-  getCategoryName(): string {
+
+  getCategoryName() {
     return this.categories.find(c => c.id === this.selectedCategory)?.name || 'Select category';
   }
-  
-  getConditionName(): string {
+
+  getConditionName() {
     return this.conditions.find(c => c.id === this.selectedCondition)?.name || 'Select condition';
   }
-  
+
   onFileSelect(event: any) {
-    const file = event.target.files[0] as File;
+    const file = event.target.files[0];
     if (file) {
       this.selectedImage = file;
       this.imagePreviewUrl = URL.createObjectURL(file);
     }
   }
-  
+
   removeImage() {
-    if (this.imagePreviewUrl) {
-      URL.revokeObjectURL(this.imagePreviewUrl);
-    }
+    if (this.imagePreviewUrl) URL.revokeObjectURL(this.imagePreviewUrl);
     this.selectedImage = null;
-    this.imagePreviewUrl = '';
+
+    this.imagePreviewUrl = this.currentProduct?.imageUrl || '';
   }
-  
-  onSubmit() {
+
+  async onSubmit() {
     if (!this.isFormValid()) {
       this.errorMessage = 'Please fill in all required fields.';
       return;
     }
 
-    const currentUser = this.authService.getCurrentUser();
-    if (!currentUser || !currentUser.id) {
-      this.errorMessage = 'Please login to list a product.';
+    const user = this.authService.getCurrentUser();
+    if (!user?.id) {
       this.router.navigate(['/login']);
       return;
     }
 
     this.isSubmitting = true;
-    this.errorMessage = '';
 
-    // Handle image upload if a new image was selected
-    if (this.selectedImage) {
-      this.isUploading = true;
-      
-      this.productService.uploadImage(this.selectedImage).subscribe({
-        next: (imageUrl) => {
-          this.isUploading = false;
-          if (this.isEditMode) {
-            this.updateProduct(imageUrl, currentUser.id!);
-          } else {
-            this.createProduct(imageUrl, currentUser.id!);
-          }
-        },
-        error: (error) => {
-          console.error('Image upload failed:', error);
-          this.errorMessage = 'Failed to upload image. Please try again.';
-          this.isUploading = false;
-          this.isSubmitting = false;
-        }
-      });
-    } else {
-      // Use existing image URL for edit mode, or empty string for create
-      const imageUrl = this.isEditMode ? (this.currentProduct?.imageUrl || '') : '';
-      
-      if (this.isEditMode) {
-        this.updateProduct(imageUrl, currentUser.id!);
-      } else {
-        this.createProduct(imageUrl, currentUser.id!);
-      }
-    }
-  }
-
-  private createProduct(imageUrl: string, sellerId: number) {
     const productRequest: ProductRequest = {
       title: this.productTitle,
       description: this.description,
@@ -202,61 +166,69 @@ export class SellComponent implements OnInit {
       category: this.selectedCategory,
       condition: this.selectedCondition,
       location: this.location,
-      imageUrl: imageUrl,
-      sellerId: sellerId
+      imageUrl: this.currentProduct?.imageUrl || '',
+      sellerId: user.id
     };
 
-    this.productService.createProduct(productRequest).subscribe({
-      next: (product) => {
-        console.log('Product created successfully:', product);
-        this.router.navigate(['/my-listings']);
-      },
-      error: (error) => {
-        console.error('Product creation failed:', error);
-        this.errorMessage = error.error?.message || 'Failed to create product. Please try again.';
-        this.isSubmitting = false;
-      }
-    });
+    if (this.isEditMode) {
+      this.updateProduct(productRequest);
+    } else {
+      this.createProduct(productRequest);
+    }
   }
-  
-  private updateProduct(imageUrl: string, sellerId: number) {
-    if (!this.editProductId) {
-      this.errorMessage = 'Invalid product ID for editing.';
+
+  private createProduct(productRequest: ProductRequest) {
+    if (this.selectedImage) {
+      this.isUploading = true;
+
+      this.productService
+        .createProductWithImage(productRequest, this.selectedImage)
+        .subscribe({
+          next: () => this.router.navigate(['/my-listings']),
+          error: () => {
+            this.errorMessage = 'Failed to create product.';
+            this.isUploading = false;
+            this.isSubmitting = false;
+          }
+        });
+    } else {
+      this.productService.createProduct(productRequest).subscribe({
+        next: () => this.router.navigate(['/my-listings']),
+        error: () => {
+          this.errorMessage = 'Failed to create product.';
+          this.isSubmitting = false;
+        }
+      });
+    }
+  }
+
+  private updateProduct(productRequest: ProductRequest) {
+    if (!this.editProductId) return;
+
+    if (this.selectedImage) {
+      this.errorMessage = 'Updating image is not supported.';
       this.isSubmitting = false;
       return;
     }
 
-    const productRequest: ProductRequest = {
-      title: this.productTitle,
-      description: this.description,
-      price: this.price!,
-      category: this.selectedCategory,
-      condition: this.selectedCondition,
-      location: this.location,
-      imageUrl: imageUrl,
-      sellerId: sellerId
-    };
-
     this.productService.updateProduct(this.editProductId, productRequest).subscribe({
-      next: (product) => {
-        console.log('Product updated successfully:', product);
-        this.router.navigate(['/my-listings']);
-      },
-      error: (error) => {
-        console.error('Product update failed:', error);
-        this.errorMessage = error.error?.message || 'Failed to update product. Please try again.';
+      next: () => this.router.navigate(['/my-listings']),
+      error: () => {
+        this.errorMessage = 'Failed to update product.';
         this.isSubmitting = false;
       }
     });
   }
-  
-  isFormValid(): boolean {
-    return !!(this.productTitle && 
-             this.description && 
-             this.selectedCategory && 
-             this.selectedCondition &&
-             this.location &&
-             this.price && 
-             this.price > 0);
+
+  isFormValid() {
+    return (
+      this.productTitle &&
+      this.description &&
+      this.selectedCategory &&
+      this.selectedCondition &&
+      this.location &&
+      this.price &&
+      this.price > 0
+    );
   }
 }
