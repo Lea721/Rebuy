@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProductService } from '../services/product.service';
 import { Product, ProductFilter } from '../models';
+import { AuthService } from '../services/auth.service';
+import { CartService } from '../services/cart.service';
 
 @Component({
   selector: 'app-products',
@@ -40,7 +42,14 @@ export class ProductsComponent implements OnInit {
     { id: 'Used - Fair', name: 'Fair' }
   ];
 
-  constructor(private productService: ProductService) {}
+  message: string = '';
+
+  constructor(
+    private productService: ProductService,
+    private router: Router,
+    private authService: AuthService,
+    private cartService: CartService
+  ) {}
 
   ngOnInit() {
     this.loadProducts();
@@ -78,6 +87,30 @@ export class ProductsComponent implements OnInit {
     this.selectedCategory = category.id;
     this.isCategoryDropdownOpen = false;
     this.filterProducts();
+  }
+
+  onAddToCart(product: Product) {
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser || !currentUser.id) {
+      // Visitor: redirect to signup
+      this.router.navigate(['/signup']);
+      return;
+    }
+
+    this.cartService.addToCart(currentUser.id, product.id as number).subscribe({
+      next: (cartItem) => {
+        this.message = 'Product added to cart.';
+        setTimeout(() => {
+          this.message = '';
+          this.router.navigate(['/cart']);
+        }, 1000);
+      },
+      error: (err) => {
+        console.error('Failed to add to cart', err);
+        this.message = 'Failed to add to cart. Try again.';
+        setTimeout(() => this.message = '', 3000);
+      }
+    });
   }
   
   selectCondition(condition: any) {

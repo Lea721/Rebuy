@@ -134,11 +134,13 @@
               <div class="product-footer-right">
                 <span class="product-seller" *ngIf="product.seller">by {{ product.seller.name }}</span>
                 <span class="product-date">{{ product.createdAt | date:'MMM d, y' }}</span>
+                <button class="btn btn-primary" (click)="onAddToCart(product)">Add to cart</button>
               </div>
             </div>
           </div>
         </div>
       </div>
+      <div class="cart-msg" *ngIf="message">{{ message }}</div>
     </div>
   </div>
 </div>

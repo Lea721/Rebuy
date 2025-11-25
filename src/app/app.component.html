@@ -10,6 +10,7 @@
         <div class="nav-links">
           <a routerLink="/products" class="nav-link">Products</a>
           <a routerLink="/sell" class="nav-link" *ngIf="isAuthenticated()">Sell</a>
+          <a routerLink="/cart" class="nav-link" *ngIf="isAuthenticated()">Cart</a>
         </div>
         
         <!-- Authentication Actions -->
