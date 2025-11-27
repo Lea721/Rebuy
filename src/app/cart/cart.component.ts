@@ -24,7 +24,7 @@ export class CartComponent implements OnInit {
 
   ngOnInit(): void {
     const user = this.authService.getCurrentUser();
-    if (!user || !user.id) {
+    if (!user?.id) {
       // Visitors must sign up to view cart / checkout
       this.router.navigate(['/signup']);
       return;
@@ -43,7 +43,7 @@ export class CartComponent implements OnInit {
 
   remove(itemId: number) {
     const user = this.authService.getCurrentUser();
-    if (!user || !user.id) return;
+    if (!user?.id) return;
     this.cartService.removeCartItem(itemId).subscribe({
       next: () => this.loadCart(user.id!),
       error: () => this.error = 'Failed to remove item.'
@@ -52,7 +52,7 @@ export class CartComponent implements OnInit {
 
   proceedToCheckout() {
     const user = this.authService.getCurrentUser();
-    if (!user || !user.id) return;
+    if (!user?.id) return;
     // In a real flow we'd create an order. Here we simulate and stop.
     console.log('Proceed to checkout for user', user.id);
     this.cartService.clearCart(user.id).subscribe({
