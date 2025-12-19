@@ -26,7 +26,29 @@ public class CartController {
     @PostMapping("/{userId}/{productId}")
     public ResponseEntity<CartItem> addToCart(@PathVariable Long userId,
                                               @PathVariable Long productId) {
-        return ResponseEntity.ok(cartService.addToCart(userId, productId));
+        com.rebuy.entity.CartItem item = cartService.addToCart(userId, productId);
+        if (item == null) return ResponseEntity.badRequest().build();
+
+        // If quantity == 1 -> new item created -> 201 Created
+        if (item.getQuantity() == 1) {
+            return ResponseEntity.status(201).body(item);
+        }
+
+        // Existing item incremented -> 200 OK
+        return ResponseEntity.ok(item);
+    }
+
+    @PutMapping("/item/{cartItemId}")
+    public ResponseEntity<CartItem> updateQuantity(@PathVariable Long cartItemId,
+                                                   @RequestBody com.rebuy.controller.dto.CartQuantityRequest req) {
+        try {
+            CartItem updated = cartService.updateQuantity(cartItemId, req.getQuantity());
+            return ResponseEntity.ok(updated);
+        } catch (java.util.NoSuchElementException ex) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 
     @DeleteMapping("/{cartItemId}")

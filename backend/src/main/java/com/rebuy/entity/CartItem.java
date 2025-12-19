@@ -47,4 +47,11 @@ public class CartItem {
     public int getQuantity() {
         return quantity;
     }
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public void incrementQuantity(int delta) {
+        this.quantity = Math.max(1, this.quantity + delta);
+    }
 }

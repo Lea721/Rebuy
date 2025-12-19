@@ -1,14 +1,32 @@
 package com.rebuy.controller.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
 // DTO for receiving registration data from frontend
 public class RegisterRequest {
 
-    private String name;              // user's full name
-    private String email;             // login email
-    private String password;          // raw password (will be hashed)
+    @NotBlank(message = "Name is required")
+    private String name;
 
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email must be a valid address")
+    private String email;
+
+        @NotBlank(message = "Password is required")
+        @Size(min = 8, message = "Password must be at least 8 characters")
+        @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).*$",
+            message = "Password must include uppercase, lowercase, digit and special character")
+    private String password;
+
+    @Size(max = 20, message = "Phone must be at most 20 characters")
     private String phone;             // optional
+
     private String city;              // optional
+
+    @Size(max = 255)
     private String shippingAddress;   // optional
 
     public RegisterRequest() {}

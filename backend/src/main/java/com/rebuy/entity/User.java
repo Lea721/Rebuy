@@ -28,6 +28,7 @@ public class User {
 
     // =================== OPTIONAL PROFILE FIELDS ===================
 
+    @Column(unique = true, length = 20)
     private String phone;  // user phone number
 
     private String city; // location of the user (optional)

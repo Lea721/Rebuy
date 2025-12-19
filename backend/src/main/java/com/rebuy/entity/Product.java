@@ -1,8 +1,20 @@
 package com.rebuy.entity;
 
-import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "products") // This will create/update the "products" table in Supabase
@@ -45,6 +57,11 @@ public class Product {
     @Column(length = 500)
     private String imageUrl; // Temporary: only 1 image. Later we can add multiple images.
 
+    @Column(name = "image_content_type", length = 100)
+    private String imageContentType;
+
+    @Column(name = "image_filename", length = 255)
+    private String imageFilename;
 
 
     // ==================== STATUS ====================
@@ -115,6 +132,12 @@ public class Product {
 
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public String getImageContentType() { return imageContentType; }
+    public void setImageContentType(String imageContentType) { this.imageContentType = imageContentType; }
+
+    public String getImageFilename() { return imageFilename; }
+    public void setImageFilename(String imageFilename) { this.imageFilename = imageFilename; }
 
     public ProductStatus getStatus() { return status; }
     public void setStatus(ProductStatus status) { this.status = status; }

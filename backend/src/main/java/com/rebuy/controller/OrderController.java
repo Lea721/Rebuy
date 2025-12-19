@@ -19,6 +19,7 @@ public class OrderController {
 
     @PostMapping("/create")
     public ResponseEntity<OrderResponse> createOrder(@RequestBody CreateOrderRequest request) {
-        return ResponseEntity.ok(orderService.createOrder(request));
+        OrderResponse resp = orderService.createOrder(request);
+        return ResponseEntity.created(java.net.URI.create("/api/orders/" + resp.getOrderId())).body(resp);
     }
 }
