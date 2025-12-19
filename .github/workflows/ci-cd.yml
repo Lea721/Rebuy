@@ -7,7 +7,14 @@ on:
       - mainCICD
   pull_request:
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: rebuy-backend
+  DOCKERFILE_PATH: Rebuy-backend-with-tests/backend/Dockerfile
+  BUILD_CONTEXT: Rebuy-backend-with-tests/backend
+
 jobs:
+  # STAGE 1: TEST
   test-backend:
     runs-on: ubuntu-latest
     steps:
@@ -24,7 +31,8 @@ jobs:
           cd Rebuy-backend-with-tests/backend
           mvn test
 
-  build-and-push:
+  # STAGE 2: BUILD
+  build:
     runs-on: ubuntu-latest
     needs: test-backend
     steps:
@@ -36,21 +44,45 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Log in to Docker registry
-        uses: docker/login-action@v2
-        with:
-          registry: docker.io
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Set image name
-        run: echo "IMAGE_NAME=${{ github.repository_owner }}/rebuy-backend:latest" >> $GITHUB_ENV
-
-      - name: Build and push
+      - name: Build Docker image
         uses: docker/build-push-action@v5
         with:
-          context: Rebuy-backend-with-tests/backend
-          file: Rebuy-backend-with-tests/backend/Dockerfile
+          context: ${{ env.BUILD_CONTEXT }}
+          file: ${{ env.DOCKERFILE_PATH }}
+          push: false
+          tags: ${{ env.IMAGE_NAME }}:latest
+
+  # STAGE 3: REGISTRY PUSH
+  push-to-registry:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push to GHCR
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ env.BUILD_CONTEXT }}
+          file: ${{ env.DOCKERFILE_PATH }}
           push: true
-          tags: ${{ env.IMAGE_NAME }}
+          tags: |
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
           platforms: linux/amd64,linux/arm64
