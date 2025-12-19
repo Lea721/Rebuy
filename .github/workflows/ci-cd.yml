@@ -37,15 +37,18 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build backend image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/rebuy-backend:latest Rebuy-backend-with-tests/backend
+        working-directory: Rebuy-backend-with-tests/backend
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/rebuy-backend:latest .
 
       - name: Push backend image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/rebuy-backend:latest
 
       - name: Build frontend image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/rebuy-frontend:latest Rebuy-Frontend
+        working-directory: Rebuy-Frontend
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/rebuy-frontend:latest .
 
       - name: Push frontend image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/rebuy-frontend:latest
+
 
 
