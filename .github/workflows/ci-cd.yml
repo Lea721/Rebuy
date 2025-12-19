@@ -24,4 +24,6 @@ jobs:
       - name: Run backend tests using Maven Wrapper
         run: |
           cd Rebuy-backend-with-tests/backend
+          ls -la
+          sed -i 's/\r$//' mvnw
           bash mvnw test
