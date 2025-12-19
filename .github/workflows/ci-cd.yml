@@ -3,7 +3,7 @@ name: CI/CD Rebuy Project
 on:
   push:
     branches:
-      - main
+      - mainCICD
   pull_request:
 
 jobs:
