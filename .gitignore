@@ -1,0 +1,13 @@
+# Node / Angular
+node_modules/
+.angular/
+coverage/
+
+# Build outputs
+dist/
+target/
+
+# Environment & IDE
+.env
+.idea/
+.vscode/
