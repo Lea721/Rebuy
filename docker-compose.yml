@@ -1,0 +1,43 @@
+version: "3.9"
+ 
+services:
+  db:
+    image: postgres:17
+    container_name: rebuy-db
+    environment:
+      POSTGRES_DB: rebuy_db
+      POSTGRES_USER: rebuy_user
+      POSTGRES_PASSWORD: rebuy_pass
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rebuy_user -d rebuy_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+ 
+  backend:
+    container_name: rebuy-backend
+    build:
+      context: ./Rebuy-backend-with-tests/backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/rebuy_db
+      SPRING_DATASOURCE_USERNAME: rebuy_user
+      SPRING_DATASOURCE_PASSWORD: rebuy_pass
+    depends_on:
+      db:
+        condition: service_healthy
+ 
+  frontend:
+    container_name: rebuy-frontend
+    build:
+      context: ./Rebuy-Frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+ 
+volumes:
+  pgdata:
