@@ -49,7 +49,6 @@ jobs:
       - name: Build and push backend image
         working-directory: Rebuy-backend-with-tests/backend
         run: |
-          # Build and push in one command
           docker buildx build \
             -t ${{ secrets.DOCKER_USERNAME }}/rebuy-backend:latest \
             --push .
