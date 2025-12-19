@@ -1,0 +1,25 @@
+<div class="cart-page">
+  <div class="container">
+    <h2>Your Cart</h2>
+
+    <div *ngIf="isLoading">Loading cart...</div>
+    <div *ngIf="error" class="error">{{ error }}</div>
+
+    <div *ngIf="!isLoading && items.length === 0">Your cart is empty.</div>
+
+    <div class="cart-list" *ngIf="items.length > 0">
+      <div class="cart-item" *ngFor="let item of items">
+        <img [src]="item.product?.imageUrl" alt="{{item.product?.title}}" class="thumb">
+        <div class="meta">
+          <div class="title">{{ item.product?.title }}</div>
+          <div class="price">{{ item.product?.price | currency }}</div>
+        </div>
+        <button class="remove" (click)="remove(item.id)">Remove</button>
+      </div>
+
+      <div class="cart-actions">
+        <button class="btn-primary" (click)="proceedToCheckout()">Proceed to Checkout</button>
+      </div>
+    </div>
+  </div>
+</div>

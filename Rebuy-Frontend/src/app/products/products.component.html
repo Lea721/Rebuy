@@ -1,0 +1,146 @@
+<!-- Products Page -->
+<div class="products-page">
+  <!-- Search and Filters Section -->
+  <div class="search-section">
+    <div class="container">
+      <!-- Search Bar -->
+      <div class="search-bar">
+        <div class="search-input-wrapper">
+          <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <input 
+            type="text" 
+            placeholder="Search products..."
+            class="search-input"
+            [(ngModel)]="searchQuery"
+            (input)="onSearch()"
+          >
+        </div>
+      </div>
+      
+      <!-- Filters Row -->
+      <div class="filters-row">
+        <!-- Category Filter -->
+        <div class="filter-dropdown">
+          <button 
+            class="filter-button"
+            (click)="toggleCategoryDropdown()"
+            [class.active]="isCategoryDropdownOpen"
+          >
+            {{ getCategoryName() }}
+            <svg class="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7"></path>
+            </svg>
+          </button>
+          
+          <div class="dropdown-menu" *ngIf="isCategoryDropdownOpen">
+            <button 
+              *ngFor="let category of categories"
+              class="dropdown-item"
+              [class.selected]="selectedCategory === category.id"
+              (click)="selectCategory(category)"
+            >
+              <span>{{ category.name }}</span>
+              <svg *ngIf="selectedCategory === category.id" class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m5 13 4 4L19 7"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Condition Filter -->
+        <div class="filter-dropdown">
+          <button 
+            class="filter-button"
+            (click)="toggleConditionDropdown()"
+            [class.active]="isConditionDropdownOpen"
+          >
+            {{ getConditionName() }}
+            <svg class="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7"></path>
+            </svg>
+          </button>
+          
+          <div class="dropdown-menu" *ngIf="isConditionDropdownOpen">
+            <button 
+              *ngFor="let condition of conditions"
+              class="dropdown-item"
+              [class.selected]="selectedCondition === condition.id"
+              (click)="selectCondition(condition)"
+            >
+              <span>{{ condition.name }}</span>
+              <svg *ngIf="selectedCondition === condition.id" class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m5 13 4L19 7"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Products Grid Section -->
+  <div class="products-section">
+    <div class="container">
+      <!-- Loading State -->
+      <div class="loading-state" *ngIf="isLoading">
+        <div class="loading-spinner"></div>
+        <p>Loading products...</p>
+      </div>
+
+      <!-- Error Message -->
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+        <button class="retry-btn" (click)="loadProducts()">Retry</button>
+      </div>
+      
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="!isLoading && !errorMessage && filteredProducts.length === 0">
+        <div class="empty-icon">🔍</div>
+        <h2 class="empty-title">No products found</h2>
+        <p class="empty-description">Try adjusting your filters or search query</p>
+      </div>
+      
+      <!-- Products Grid -->
+      <div class="products-grid" *ngIf="!isLoading && !errorMessage && filteredProducts.length > 0">
+        <div class="product-card" *ngFor="let product of filteredProducts">
+          <div class="product-image-container">
+            <img 
+              [src]="product.imageUrl" 
+              [alt]="product.title"
+              class="product-image"
+              (error)="onImageError($event)"
+            >
+            <div class="product-status" [class]="product.status.toLowerCase()">
+              {{ product.status }}
+            </div>
+          </div>
+          
+          <div class="product-info">
+            <h3 class="product-title">{{ product.title }}</h3>
+            <p class="product-description">{{ product.description | slice:0:100 }}{{ product.description.length > 100 ? '...' : '' }}</p>
+            
+            <div class="product-details">
+              <div class="product-meta">
+                <span class="product-category">{{ product.category }}</span>
+                <span class="product-condition">{{ product.condition }}</span>
+              </div>
+              <div class="product-location">📍 {{ product.location }}</div>
+            </div>
+            
+            <div class="product-footer">
+              <span class="product-price">{{ formatPrice(product.price) }}</span>
+              <div class="product-footer-right">
+                <span class="product-seller" *ngIf="product.seller">by {{ product.seller.name }}</span>
+                <span class="product-date">{{ product.createdAt | date:'MMM d, y' }}</span>
+                <button class="btn btn-primary" (click)="onAddToCart(product)">Add to cart</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cart-msg" *ngIf="message">{{ message }}</div>
+    </div>
+  </div>
+</div>

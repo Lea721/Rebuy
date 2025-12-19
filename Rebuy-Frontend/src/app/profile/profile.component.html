@@ -1,0 +1,116 @@
+<div class="profile-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading">
+    <p>Loading your profile...</p>
+  </div>
+
+  <!-- Profile Content -->
+  <div *ngIf="!isLoading && currentUser" class="profile-content">
+    <!-- Header Section -->
+    <div class="profile-header">
+      <div class="header-background"></div>
+      
+      <div class="profile-info">
+        <div class="profile-avatar-container">
+          <div class="profile-avatar">
+            <img 
+              *ngIf="currentUser.profileImageUrl" 
+              [src]="currentUser.profileImageUrl" 
+              [alt]="currentUser.name"
+              class="avatar-image"
+              (error)="onImageError($event)"
+            >
+            <div *ngIf="!currentUser.profileImageUrl" class="avatar-initials">
+              {{ getUserInitials() }}
+            </div>
+          </div>
+          
+          <div class="profile-details">
+            <h1 class="profile-name">{{ currentUser.name }}</h1>
+            <p class="profile-email">{{ currentUser.email }}</p>
+            <button class="edit-profile-btn" (click)="editProfile()">
+              <i class="fas fa-edit"></i> Edit Profile
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Information Cards -->
+    <div class="profile-sections">
+      <!-- Personal Information -->
+      <div class="info-card">
+        <h2 class="card-title">
+          <i class="fas fa-user"></i> Personal Information
+        </h2>
+        
+        <div class="info-grid">
+          <div class="info-item">
+            <label class="info-label">Full Name</label>
+            <p class="info-value">{{ currentUser.name || 'Not provided' }}</p>
+          </div>
+          
+          <div class="info-item">
+            <label class="info-label">Email Address</label>
+            <p class="info-value">{{ currentUser.email }}</p>
+          </div>
+          
+          <div class="info-item">
+            <label class="info-label">Phone Number</label>
+            <p class="info-value">{{ currentUser.phone || 'Not provided' }}</p>
+          </div>
+          
+          <div class="info-item">
+            <label class="info-label">City</label>
+            <p class="info-value">{{ currentUser.city || 'Not provided' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shipping Information -->
+      <div class="info-card">
+        <h2 class="card-title">
+          <i class="fas fa-shipping-fast"></i> Shipping Information
+        </h2>
+        
+        <div class="info-grid">
+          <div class="info-item full-width">
+            <label class="info-label">Shipping Address</label>
+            <p class="info-value">{{ currentUser.shippingAddress || 'Not provided' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Account Actions -->
+      <div class="info-card">
+        <h2 class="card-title">
+          <i class="fas fa-cog"></i> Account Actions
+        </h2>
+        
+        <div class="action-buttons">
+          <button class="action-btn primary" (click)="editProfile()">
+            <i class="fas fa-edit"></i> Edit Profile
+          </button>
+          
+          <button class="action-btn secondary" routerLink="/my-listings">
+            <i class="fas fa-list"></i> My Listings
+          </button>
+          
+          <button class="action-btn secondary" routerLink="/sell">
+            <i class="fas fa-plus"></i> Add New Listing
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!isLoading && !currentUser" class="error-state">
+    <div class="error-content">
+      <i class="fas fa-exclamation-triangle error-icon"></i>
+      <h2>Profile Not Found</h2>
+      <p>Please log in to view your profile.</p>
+      <button class="primary-btn" routerLink="/login">Go to Login</button>
+    </div>
+  </div>
+</div>

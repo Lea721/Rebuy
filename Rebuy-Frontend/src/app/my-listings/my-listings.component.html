@@ -1,0 +1,97 @@
+<div class="my-listings-container">
+  <div class="header">
+    <h1>My Listings</h1>
+    <button class="add-listing-btn" (click)="addNewListing()">
+      <i class="fa fa-plus"></i> Add New Listing
+    </button>
+  </div>
+
+  <div class="filters">
+    <div class="search-bar">
+      <input
+        type="text"
+        placeholder="Search your listings..."
+        [(ngModel)]="searchTerm"
+        (input)="onSearchChange()"
+        class="search-input"
+      >
+      <i class="fa fa-search search-icon"></i>
+    </div>
+
+    <div class="filter-group">
+      <select [(ngModel)]="selectedCategory" (change)="onCategoryChange()" class="filter-select">
+        <option value="">All Categories</option>
+        <option *ngFor="let category of categories" [value]="category">{{category}}</option>
+      </select>
+
+      <select [(ngModel)]="selectedCondition" (change)="onConditionChange()" class="filter-select">
+        <option value="">All Conditions</option>
+        <option *ngFor="let condition of conditions" [value]="condition">{{condition}}</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="products-section">
+    <div class="products-header">
+      <h2>Your Listings ({{filteredProducts.length}})</h2>
+    </div>
+
+    <div *ngIf="isLoading" class="loading">
+      <p>Loading your listings...</p>
+    </div>
+
+    <div *ngIf="!isLoading && filteredProducts.length === 0" class="no-products">
+      <div class="empty-state">
+        <i class="fa fa-box-open empty-icon"></i>
+        <h3>No listings found</h3>
+        <p *ngIf="products.length === 0">You haven't created any listings yet.</p>
+        <p *ngIf="products.length > 0">No listings match your current filters.</p>
+        <button *ngIf="products.length === 0" class="primary-btn" (click)="addNewListing()">
+          Create Your First Listing
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="!isLoading && filteredProducts.length > 0" class="products-grid">
+      <div *ngFor="let product of filteredProducts" class="product-card">
+        <div class="product-image-container">
+          <img 
+            [src]="product.imageUrl || 'assets/images/placeholder.png'" 
+            [alt]="product.title"
+            class="product-image"
+            (error)="onImageError($event)"
+          >
+          <div class="product-status" [class]="product.status.toLowerCase()">
+            {{ product.status || 'AVAILABLE' }}
+          </div>
+          <div class="product-actions">
+            <button class="action-btn edit-btn" (click)="editProduct(product.id!)" title="Edit">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="action-btn delete-btn" (click)="deleteProduct(product.id!)" title="Delete">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
+        </div>
+        
+        <div class="product-info">
+          <h3 class="product-title">{{ product.title }}</h3>
+          <p class="product-description">{{ product.description | slice:0:100 }}{{ product.description.length > 100 ? '...' : '' }}</p>
+          
+          <div class="product-details">
+            <div class="product-meta">
+              <span class="product-category">{{ product.category }}</span>
+              <span class="product-condition">{{ product.condition }}</span>
+            </div>
+            <div class="product-location">📍 {{ product.location }}</div>
+          </div>
+          
+          <div class="product-footer">
+            <span class="product-price">{{ formatPrice(product.price) }}</span>
+            <span class="product-date">{{ product.createdAt | date:'MMM d, y' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
