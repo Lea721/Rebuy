@@ -41,7 +41,13 @@ jobs:
 
       - name: Build backend image
         working-directory: Rebuy-backend-with-tests/backend
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/rebuy-backend:latest .
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "Files in directory:"
+          ls -la
+          echo "Testing docker command:"
+          docker buildx build -t testimage:latest .
+          echo "Command completed"
 
       - name: Push backend image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/rebuy-backend:latest
