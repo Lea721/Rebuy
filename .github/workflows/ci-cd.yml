@@ -314,30 +314,32 @@ jobs:
           echo "🔗 Use this image in your Kubernetes manifests:"
           echo "   ${{ env.REGISTRY }}/$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')/${{ env.IMAGE_NAME }}:${{ github.sha }}"
 
-# ============================================
-# FINAL NOTIFICATION
-# ============================================
-notify:
-  name: Pipeline Completion Notification
-  runs-on: ubuntu-latest
-  needs: [push-to-registry, deploy-verify]
-  if: always()
-  
-  steps:
-    - name: Pipeline Status Summary
-      run: |
-        if [[ "${{ job.status }}" == "success" ]]; then
-          echo "✅ CI/CD PIPELINE COMPLETED SUCCESSFULLY"
-          echo "=========================================="
-          echo "All requirements for the project have been met:"
-          echo "1. ✅ Test stage - Unit & Integration tests"
-          echo "2. ✅ Build stage - Docker image built"
-          echo "3. ✅ Registry push - Images pushed to GHCR"
-          echo "4. ✅ Security scan - Vulnerability checks"
-          echo "5. ✅ Database testing - Persistence verified"
-          echo ""
-          echo "Ready for technical defense!"
-        else
-          echo "❌ Pipeline failed with status: ${{ job.status }}"
-          echo "Check the failed job logs for details"
-        fi
+  # ============================================
+  # FINAL NOTIFICATION JOB
+  # ============================================
+  notify:
+    name: Pipeline Completion Notification
+    runs-on: ubuntu-latest
+    needs: [push-to-registry, deploy-verify]
+    if: always()
+    
+    steps:
+      - name: Pipeline Status Summary
+        run: |
+          if [[ "${{ needs.push-to-registry.result }}" == "success" && "${{ needs.deploy-verify.result }}" == "success" ]]; then
+            echo "✅ CI/CD PIPELINE COMPLETED SUCCESSFULLY"
+            echo "=========================================="
+            echo "All requirements for the project have been met:"
+            echo "1. ✅ Test stage - Unit & Integration tests"
+            echo "2. ✅ Build stage - Docker image built"
+            echo "3. ✅ Registry push - Images pushed to GHCR"
+            echo "4. ✅ Security scan - Vulnerability checks"
+            echo "5. ✅ Database testing - Persistence verified"
+            echo ""
+            echo "Ready for technical defense!"
+          else
+            echo "❌ Pipeline completed with failures"
+            echo "Failed jobs:"
+            echo "- push-to-registry: ${{ needs.push-to-registry.result }}"
+            echo "- deploy-verify: ${{ needs.deploy-verify.result }}"
+          fi
