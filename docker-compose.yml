@@ -1,21 +1,4 @@
-version: "3.9"
- 
 services:
-  db:
-    image: postgres:17
-    container_name: rebuy-db
-    environment:
-      POSTGRES_DB: rebuy_db
-      POSTGRES_USER: rebuy_user
-      POSTGRES_PASSWORD: rebuy_pass
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U rebuy_user -d rebuy_db"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
- 
   backend:
     container_name: rebuy-backend
     build:
@@ -23,12 +6,27 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/rebuy_db
-      SPRING_DATASOURCE_USERNAME: rebuy_user
-      SPRING_DATASOURCE_PASSWORD: rebuy_pass
-    depends_on:
-      db:
-        condition: service_healthy
+      # Database configuration (use session pooler URL)
+      SPRING_DATASOURCE_URL: jdbc:postgresql://aws-1-ap-south-1.pooler.supabase.com:5432/postgres?sslmode=require
+      SPRING_DATASOURCE_USERNAME: postgres.qhrszjbdeipydpagoyii
+      SPRING_DATASOURCE_PASSWORD: RebuyProject12
+     
+      # HikariCP settings (important for Supabase pooler)
+      SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: 2
+      SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT: 30000
+     
+      # JPA settings
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: true
+      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: true
+     
+      # Supabase Storage configuration
+      SUPABASE_URL: https://qhrszjbdeipydpagoyii.supabase.co
+      SUPABASE_SERVICE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFocnN6amJkZWlweWRwYWdveWlpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MzIzMDI5OSwiZXhwIjoyMDc4ODA2Mjk5fQ.4Eg9aoWYfygpo2hp5NLT9wjr7q3pzfhStjW7nEBn_Xg
+      SUPABASE_BUCKET: products_
+     
+      # Disable Flyway if not using migrations
+      SPRING_FLYWAY_ENABLED: false
  
   frontend:
     container_name: rebuy-frontend
@@ -38,6 +36,3 @@ services:
       - "3000:80"
     depends_on:
       - backend
- 
-volumes:
-  pgdata:
