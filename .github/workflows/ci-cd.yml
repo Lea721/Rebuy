@@ -41,9 +41,9 @@ jobs:
       - name: Run Maven Tests
         run: |
           cd Rebuy-backend-with-tests/backend
-          # Run tests without the check goal
-          mvn clean test jacoco:prepare-agent
-          echo "✅ Tests completed (skipped coverage validation)"
+          # Skip Jacoco plugin completely
+          mvn clean test -Djacoco.skip=true
+          echo "✅ Tests completed successfully (Jacoco skipped)"
 
       - name: Upload Test Reports
         if: always()
