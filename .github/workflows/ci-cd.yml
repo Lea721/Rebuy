@@ -1,11 +1,3 @@
-name: CI/CD Rebuy Project
-
-on:
-  push:
-    branches:
-      - mainCICD
-  pull_request:
-
 jobs:
   test-backend:
     runs-on: ubuntu-latest
