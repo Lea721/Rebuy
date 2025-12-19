@@ -21,8 +21,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Grant execute permission to mvnw
-        run: chmod +x Rebuy-backend-with-tests/backend/mvnw
-
-      - name: Run backend tests
-        run: cd Rebuy-backend-with-tests/backend && ./mvnw test
+      - name: Run backend tests (Maven Wrapper)
+        run: |
+          cd Rebuy-backend-with-tests/backend
+          bash mvnw test
