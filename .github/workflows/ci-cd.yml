@@ -48,10 +48,7 @@ jobs:
 
       - name: Build and push backend image
         working-directory: Rebuy-backend-with-tests/backend
-        run: |
-          docker buildx build \
-            -t ${{ secrets.DOCKER_USERNAME }}/rebuy-backend:latest \
-            --push .
+        run: docker buildx build -t ${{ secrets.DOCKER_USERNAME }}/rebuy-backend:latest --push .
 
       - name: Build and push frontend image
         working-directory: Rebuy-Frontend
