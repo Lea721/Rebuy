@@ -49,5 +49,5 @@ jobs:
           context: Rebuy-backend-with-tests/backend
           file: Rebuy-backend-with-tests/backend/Dockerfile
           push: true
-          tags: myrepo/myimage:tag
+          tags: ${{ secrets.DOCKER_USERNAME }}/rebuy-backend:latest
           platforms: linux/amd64,linux/arm64
