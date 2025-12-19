@@ -221,21 +221,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Generate Image Tags
-        id: tags
-        run: |
-          SHORT_SHA=$(git rev-parse --short HEAD)
-          DATE_TAG=$(date +%Y%m%d-%H%M%S)
-          
-          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
-            VERSION_TAG="${GITHUB_REF#refs/tags/}"
-            echo "tags=latest,$VERSION_TAG,$VERSION_TAG-$DATE_TAG" >> $GITHUB_OUTPUT
-          else
-            BRANCH_NAME=${GITHUB_REF#refs/heads/}
-            BRANCH_NAME_CLEAN=${BRANCH_NAME//\//-}
-            echo "tags=latest,$BRANCH_NAME_CLEAN-latest,$BRANCH_NAME_CLEAN-$SHORT_SHA,sha-$SHORT_SHA" >> $GITHUB_OUTPUT
-          fi
-
       - name: Lowercase Repository Owner
         run: |
           echo "REPO_OWNER_LOWER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
@@ -257,7 +242,6 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ env.REPO_OWNER_LOWER }}/${{ env.IMAGE_NAME }}:latest
             ${{ env.REGISTRY }}/${{ env.REPO_OWNER_LOWER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-            ${{ env.REGISTRY }}/${{ env.REPO_OWNER_LOWER }}/${{ env.IMAGE_NAME }}:${{ steps.tags.outputs.tags }}
           labels: |
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
@@ -267,10 +251,11 @@ jobs:
 
       - name: Verify Push Success
         run: |
-          echo "✅ Images successfully pushed to:"
-          echo "   ${{ env.REGISTRY }}/${{ env.REPO_OWNER_LOWER }}/${{ env.IMAGE_NAME }}:latest"
-          echo "   ${{ env.REGISTRY }}/${{ env.REPO_OWNER_LOWER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
-          echo "   Additional tags: ${{ steps.tags.outputs.tags }}"
+          echo "✅ Images successfully pushed to GHCR:"
+          echo "📦 ${{ env.REGISTRY }}/${{ env.REPO_OWNER_LOWER }}/${{ env.IMAGE_NAME }}:latest"
+          echo "📦 ${{ env.REGISTRY }}/${{ env.REPO_OWNER_LOWER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          echo ""
+          echo "🎯 CI/CD Pipeline Stage: COMPLETE"
 
   # ============================================
   # STAGE 6: DEPLOYMENT VERIFICATION
