@@ -21,9 +21,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Run backend tests using Maven Wrapper
+      - name: Run backend tests
         run: |
           cd Rebuy-backend-with-tests/backend
-          ls -la
-          sed -i 's/\r$//' mvnw
-          bash mvnw test
+          mvn test
