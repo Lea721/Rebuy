@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rebuy-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rebuy-backend
+  template:
+    metadata:
+      labels:
+        app: rebuy-backend
+    spec:
+      containers:
+      - name: springboot-backend
+        image: kawsarz/rebuy-backend:v1
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: backend-config
+
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          failureThreshold: 3
+
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 40
+          periodSeconds: 15
+          failureThreshold: 3
