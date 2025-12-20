@@ -45,7 +45,7 @@ jobs:
           # This SKIPS the verify phase where Jacoco check runs
           mvn clean compile test-compile surefire:test
           
-          echo "✅ Tests completed successfully - verify phase skipped"
+          echo "Tests completed successfully - verify phase skipped"
 
       - name: Upload Test Reports
         if: always()
@@ -94,10 +94,10 @@ jobs:
         run: |
           for i in {1..30}; do
             if nc -z $DB_HOST $DB_PORT; then
-              echo "✅ Database host reachable"
+              echo "Database host reachable"
               break
             fi
-            echo "⏳ Waiting for DB host... ($i/30)"
+            echo "Waiting for DB host... ($i/30)"
             sleep 5
           done
 
@@ -109,7 +109,7 @@ jobs:
         run: |
           cd Rebuy-backend-with-tests/backend
           mvn verify -DskipTests=false -Dspring.datasource.url="$SPRING_DATASOURCE_URL" -Dspring.datasource.username="$SPRING_DATASOURCE_USERNAME" -Dspring.datasource.password="$SPRING_DATASOURCE_PASSWORD"
-          echo "✅ Database integration tests completed against Supabase"
+          echo "Database integration tests completed against Supabase"
 
   # ============================================
   # STAGE 3: BUILD DOCKER IMAGE
@@ -197,7 +197,7 @@ jobs:
         run: |
           cd Rebuy-backend-with-tests/backend
           mvn dependency:tree
-          echo "✅ Dependency tree generated for security review"
+          echo "Dependency tree generated for security review"
 
   # ============================================
   # STAGE 5: PUSH TO REGISTRY
@@ -253,11 +253,11 @@ jobs:
 
       - name: Verify Push Success
         run: |
-          echo "✅ Images successfully pushed to GHCR:"
-          echo "📦 ${{ env.REGISTRY }}/${{ env.REPO_OWNER_LOWER }}/${{ env.IMAGE_NAME }}:latest"
-          echo "📦 ${{ env.REGISTRY }}/${{ env.REPO_OWNER_LOWER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          echo "Images successfully pushed to GHCR:"
+          echo "${{ env.REGISTRY }}/${{ env.REPO_OWNER_LOWER }}/${{ env.IMAGE_NAME }}:latest"
+          echo "${{ env.REGISTRY }}/${{ env.REPO_OWNER_LOWER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
           echo ""
-          echo "🎯 CI/CD Pipeline Stage: COMPLETE"
+          echo "CI/CD Pipeline Stage: COMPLETE"
 
   # ============================================
   # STAGE 6: DEPLOYMENT VERIFICATION
@@ -271,7 +271,7 @@ jobs:
     steps:
       - name: Generate Deployment Report
         run: |
-          echo "# 🚀 Deployment Report" > deployment-report.md
+          echo "# Deployment Report" > deployment-report.md
           echo "" >> deployment-report.md
           echo "## Pipeline Summary" >> deployment-report.md
           echo "- **Repository**: ${{ github.repository }}" >> deployment-report.md
@@ -282,11 +282,11 @@ jobs:
           echo "- **Registry Path**: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}" >> deployment-report.md
           echo "" >> deployment-report.md
           echo "## Pipeline Stages Status" >> deployment-report.md
-          echo "1. ✅ Unit Tests - PASSED" >> deployment-report.md
-          echo "2. ✅ Database Integration Tests - PASSED" >> deployment-report.md
-          echo "3. ✅ Docker Build - PASSED" >> deployment-report.md
-          echo "4. ✅ Security Scan - PASSED" >> deployment-report.md
-          echo "5. ✅ Registry Push - PASSED" >> deployment-report.md
+          echo "1. Unit Tests - PASSED" >> deployment-report.md
+          echo "2. Database Integration Tests - PASSED" >> deployment-report.md
+          echo "3. Docker Build - PASSED" >> deployment-report.md
+          echo "4. Security Scan - PASSED" >> deployment-report.md
+          echo "5. Registry Push - PASSED" >> deployment-report.md
           echo "" >> deployment-report.md
           echo "## Next Steps for Kubernetes Deployment" >> deployment-report.md
           echo "```bash" >> deployment-report.md
@@ -305,9 +305,9 @@ jobs:
       - name: Create Pipeline Success Tag
         if: success()
         run: |
-          echo "🎉 Pipeline completed successfully!"
-          echo "📦 Images are available in GitHub Container Registry"
-          echo "🔗 Use this image in your Kubernetes manifests:"
+          echo "Pipeline completed successfully!"
+          echo "Images are available in GitHub Container Registry"
+          echo "Use this image in your Kubernetes manifests:"
           echo "   ${{ env.REGISTRY }}/$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')/${{ env.IMAGE_NAME }}:${{ github.sha }}"
 
   # ============================================
@@ -323,18 +323,18 @@ jobs:
       - name: Pipeline Status Summary
         run: |
           if [[ "${{ needs.push-to-registry.result }}" == "success" && "${{ needs.deploy-verify.result }}" == "success" ]]; then
-            echo "✅ CI/CD PIPELINE COMPLETED SUCCESSFULLY"
+            echo "CI/CD PIPELINE COMPLETED SUCCESSFULLY"
             echo "=========================================="
             echo "All requirements for the project have been met:"
-            echo "1. ✅ Test stage - Unit & Integration tests"
-            echo "2. ✅ Build stage - Docker image built"
-            echo "3. ✅ Registry push - Images pushed to GHCR"
-            echo "4. ✅ Security scan - Vulnerability checks"
-            echo "5. ✅ Database testing - Persistence verified"
+            echo "1. Test stage - Unit & Integration tests"
+            echo "2. Build stage - Docker image built"
+            echo "3. Registry push - Images pushed to GHCR"
+            echo "4. Security scan - Vulnerability checks"
+            echo "5. Database testing - Persistence verified"
             echo ""
             echo "Ready for technical defense!"
           else
-            echo "❌ Pipeline completed with failures"
+            echo "Pipeline completed with failures"
             echo "Failed jobs:"
             echo "- push-to-registry: ${{ needs.push-to-registry.result }}"
             echo "- deploy-verify: ${{ needs.deploy-verify.result }}"
