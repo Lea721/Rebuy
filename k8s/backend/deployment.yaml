@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: rebuy-backend:latest
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - containerPort: 8080
+
+          envFrom:
+            - configMapRef:
+                name: backend-config
+            - secretRef:
+                name: backend-secret
+
+          readinessProbe:
+            httpGet:
+              path: /api/products
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 5
+
+          livenessProbe:
+            httpGet:
+              path: /api/products
+              port: 8080
+            initialDelaySeconds: 40
+            periodSeconds: 15
+            failureThreshold: 3
+            timeoutSeconds: 3
