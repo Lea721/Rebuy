@@ -108,8 +108,11 @@ jobs:
           SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
         run: |
           cd Rebuy-backend-with-tests/backend
-          mvn verify -DskipTests=false -Dspring.datasource.url="$SPRING_DATASOURCE_URL" -Dspring.datasource.username="$SPRING_DATASOURCE_USERNAME" -Dspring.datasource.password="$SPRING_DATASOURCE_PASSWORD"
-          echo "Database integration tests completed against Supabase"
+          mvn verify \
+            -Dspring.profiles.active=integration \
+            -Dspring.datasource.hikari.maximum-pool-size=2 \
+            -Dspring.datasource.hikari.minimum-idle=1 \
+            -Dspring.datasource.hikari.connection-timeout=30000
 
   # ============================================
   # STAGE 3: BUILD DOCKER IMAGE
@@ -162,7 +165,7 @@ jobs:
           retention-days: 1
 
   # ============================================
-  # STAGE 4: SECURITY SCAN (Optional Bonus)
+  # STAGE 4: SECURITY SCAN 
   # ============================================
   security-scan:
     name: Security Vulnerability Scan
