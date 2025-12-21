@@ -4,39 +4,62 @@ The Rebuy Website is an e-commerce platform designed to help users easily repurc
 Rebuy is a full-stack web application developed as part of the DevOps, CI/CD & Containerization course.
 
 The objective of this project is to demonstrate the complete DevOps lifecycle of a modern application, including:
+
 •	Containerization using Docker
+
 •	Automated CI/CD pipelines
+
 •	Deployment on Kubernetes
+
 •	Secure configuration and persistence management
 
 Architecture Overview:
 The application follows a client–server architecture composed of the following components:
+
 •	Frontend: Angular application served using Nginx
+
 •	Backend: Spring Boot REST API (Java 17)
+
 •	Database: External PostgreSQL database hosted on Supabase (Option B)
+
 •	Containerization: Docker & Docker Compose
+
 •	CI/CD: GitHub Actions
+
 •	Container Registry: GitHub Container Registry (GHCR)
+
 •	Orchestration: Kubernetes (Docker Desktop)
+
 •	Security: Kubernetes Secrets, Trivy vulnerability scanning
+
 This architecture ensures modularity, scalability, and adherence to DevOps best practices.
 
 Application Features:
 
 •	Product listing and management
+
 •	User management
+
 •	Image upload and storage using Supabase Storage
+
 •	Persistent data storage using PostgreSQL
+
 •	RESTful API communication between frontend and backend
 
 Docker & Containerization:
 Dockerfiles
 The project uses multi-stage Dockerfiles to optimize image size and performance:
+
 •	Backend:
+   
     o	Build stage using Maven
+    
     o	Runtime stage using a lightweight JRE
+
 •	Frontend:
+    
     o	Build stage using Node.js
+    
     o	Runtime stage using Nginx
 
 This approach ensures efficient and production-ready Docker images.
@@ -45,14 +68,23 @@ In addition to the Dockerfiles, the project includes .dockerignore files for bot
 
 Docker Compose:
 Docker Compose is used for local development and testing of the Rebuy application.
+
 •	The Compose stack defines the following services:
+   
     o	Frontend service: Angular application served via Nginx and exposed on port 3000.
+    
     o	Backend service: Spring Boot REST API exposed on port 8080.
+
 •	The database is hosted externally on Supabase (PostgreSQL); no local database container is required.
+
 •	Environment variables are injected securely using a .env file, which is not committed to the repository.
+
 •	A health check is configured for the backend using the /actuator/health endpoint.
+
 •	The frontend service starts only after the backend becomes healthy using depends_on.
+
 •	A named Docker volume is used to persist backend logs across container restarts.
+
 •	A dedicated bridge network enables isolated inter-service communication.
 
 Docker Desktop must be running before testing the Docker Compose setup.
@@ -70,30 +102,46 @@ A complete CI/CD pipeline is implemented using GitHub Actions to automate testin
 Pipeline Stages
 
 1.	Unit Tests
-    o	Sets up Java 17 and executes Spring Boot unit tests using Maven.
-    o	Ensures code correctness before moving to later stages.
-    o	Test reports are uploaded as artifacts for traceability.
-2.	Database Integration Tests
-    o	Validates backend connectivity with the external Supabase PostgreSQL database.
-    o	Database credentials are securely loaded from GitHub Secrets.
-    o	The pipeline verifies database reachability before running integration tests.
-3.	Docker Image Build
-    o	Builds the backend Docker image using a multi-stage Dockerfile.
-    o	Uses Docker Buildx and QEMU to generate multi-architecture images (amd64, arm64).
-    o	Build metadata is generated using commit SHA or Git tags.
-    o	The built image is stored temporarily as an artifact.
-4.	Security Scan (Bonus)
-    o	Uses Trivy to scan the backend source and dependencies for vulnerabilities.
-    o	Focuses on HIGH and CRITICAL severity issues.
-    o	Security results are uploaded in SARIF format for analysis.
-5.	Image Push
-    o	Authenticates securely to GitHub Container Registry (GHCR).
-    o	Pushes versioned and latest Docker images only after all previous stages succeed.
-    o	Ensures reproducible and trusted images for Kubernetes deployment.
-6.	Deployment Verification
-    o	Generates a deployment report summarizing pipeline execution.
-    o	Provides the exact Docker image reference to be used in Kubernetes manifests.
-This CI/CD pipeline enforces code quality, database validation, security checks, and reproducible container builds, ensuring a reliable and production-ready DevOps workflow.
+
+  	o	Sets up Java 17 and executes Spring Boot unit tests using Maven.
+
+  	o	Ensures code correctness before moving to later stages.
+
+  	o	Test reports are uploaded as artifacts for traceability.
+
+2.	Docker Image Build
+
+  	o	Builds the backend Docker image using a multi-stage Dockerfile.
+
+  	o	Uses Docker Buildx and QEMU to generate multi-architecture images (amd64, arm64).
+
+  	o	Build metadata is generated using commit SHA or Git tags.
+
+  	o	The built image is stored temporarily as an artifact.
+
+3.	Security Scan (Bonus)
+
+  	o	Uses Trivy to scan the backend source and dependencies for vulnerabilities.
+
+  	o	Focuses on HIGH and CRITICAL severity issues.
+
+  	o	Security results are uploaded in SARIF format for analysis.
+
+4.	Image Push
+
+  	o	Authenticates securely to GitHub Container Registry (GHCR).
+
+  	o	Pushes versioned and latest Docker images only after all previous stages succeed.
+
+  	o	Ensures reproducible and trusted images for Kubernetes deployment.
+
+5.	Deployment Verification
+
+   	o	Generates a deployment report summarizing pipeline execution.
+
+   	o	Provides the exact Docker image reference to be used in Kubernetes manifests.
+
+This CI/CD pipeline enforces code quality, security checks, and reproducible container builds, while database persistence is validated through Docker Compose and Kubernetes deployment.
 
 ![CI/CD Pipeline](pictures/CICD-Pipeline.png)
 
@@ -105,11 +153,17 @@ The backend exposes a REST API, including the /api/products endpoint, which hand
 
 
 A readiness probe is configured on the /api/products endpoint:
+
 •	Ensures the backend is fully initialized and able to serve product-related requests before receiving traffic.
+
 •	Prevents Kubernetes from routing traffic to the pod until the API is ready.
+
 A liveness probe is configured on the custom /health endpoint:
+
 •	Verifies that the backend application remains responsive during runtime.
+
 •	Automatically restarts the container if the health check fails.
+
 This configuration ensures reliable startup and continuous health monitoring within the Kubernetes cluster.
 
 Frontend Kubernetes Deployment:
@@ -139,6 +193,7 @@ kubectl apply -f k8s/frontend/service.yaml
 
 
 The deployment was verified using the following commands.
+
 •	Verify that all pods are running:
 
 ![Kubernetes Pods](pictures/GetPods.png)
@@ -169,10 +224,15 @@ These checks confirm correct pod execution, service discovery, internal communic
 Database Configuration – Option B (External Database)
 The application uses an external Supabase PostgreSQL database.
 Justification for Option B:
+
 •	Simplifies Kubernetes state management
+
 •	Ensures secure and managed persistence
+
 •	Avoids the complexity of StatefulSets for a student project
+
 •	Allows focus on CI/CD and orchestration concepts
+
 The database connection is secured using SSL.
 
 Conclusion
