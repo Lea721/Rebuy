@@ -13,7 +13,7 @@ on:
       - mainCICD
   workflow_dispatch:  # Manual trigger option for demonstrations
 
-# Environment variables - using YOUR existing variables
+# Environment variables 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: rebuy-backend
@@ -41,11 +41,8 @@ jobs:
       - name: Run Maven Tests
         run: |
           cd Rebuy-backend-with-tests/backend
-          
-          # This SKIPS the verify phase where Jacoco check runs
           mvn clean compile test-compile surefire:test
           
-          echo "Tests completed successfully - verify phase skipped"
 
       - name: Upload Test Reports
         if: always()
@@ -76,8 +73,6 @@ jobs:
       - name: Generate Build Metadata
         id: meta
         run: |
-          echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-          echo "timestamp=$(date +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
           if [[ "${{ github.ref }}" == refs/tags/* ]]; then
             echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
           else
